@@ -5,6 +5,7 @@ import DocumentViewer from "@/components/document-viewer";
 import Chat from "@/components/chat";
 import { useEffect, useRef, useState } from "react";
 import { GripVertical } from "lucide-react";
+import { useCoAgent, useCoAgentStateRender } from "@copilotkit/react-core";
 
 const CHAT_MIN_WIDTH = 30;
 const CHAT_MAX_WIDTH = 50;
@@ -13,6 +14,25 @@ export default function HomePage() {
     const [chatWidth, setChatWidth] = useState(50) // Initial chat width in percentage
     const dividerRef = useRef<HTMLDivElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
+
+    const { state, setState } = useCoAgent<any>({
+        name: 'graph',
+        initialState: {},
+    });
+
+    console.log({
+        agentState: state,
+    })
+
+    useCoAgentStateRender({
+        name: 'graph',
+        // render: ({ state, nodeName, status }) => {
+        //     if (!state.logs || state.logs.length === 0) {
+        //         return null;
+        //     }
+        //     return <Progress logs={state.logs} />;
+        // },
+    });
 
     useEffect(() => {
         const divider = dividerRef.current

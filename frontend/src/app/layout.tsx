@@ -31,7 +31,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${lato.variable} ${noto.className} antialiased`}>
-                <CopilotKit runtimeUrl="/api/copilotkit" showDevConsole={false}>
+                <CopilotKit runtimeUrl="/api/copilotkit" showDevConsole={false} agent="graph">
                     {children}
                 </CopilotKit>
             </body>
