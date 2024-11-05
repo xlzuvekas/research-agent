@@ -15,7 +15,7 @@ const runtime = new CopilotRuntime({
             deploymentUrl: 'https://matcopvili-006c9a30efb35afd99b9676057b7accd.default.us.langgraph.app',
             langsmithApiKey: process.env.LANGSMITH_API_KEY!,
             agents: [{
-                name: 'graph',
+                name: 'agent',
                 description: 'Research assistant',
             }],
         })
