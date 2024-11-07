@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "@copilotkit/react-ui/styles.css";
 import "./globals.css";
 import { CopilotKit } from "@copilotkit/react-core";
