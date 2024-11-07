@@ -15,23 +15,29 @@ export default function HomePage() {
     const dividerRef = useRef<HTMLDivElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
 
-    const { state, setState } = useCoAgent<any>({
-        name: 'graph',
+    const { state, setState } = useCoAgent<unknown>({
+        name: 'agent',
         initialState: {},
     });
 
-    console.log({
-        agentState: state,
-    })
-
     useCoAgentStateRender({
-        name: 'graph',
-        // render: ({ state, nodeName, status }) => {
-        //     if (!state.logs || state.logs.length === 0) {
-        //         return null;
-        //     }
-        //     return <Progress logs={state.logs} />;
-        // },
+        name: 'agent',
+        render: ({ state, nodeName, status }) => {
+            console.log({
+                state,
+                nodeName,
+                status,
+            })
+
+            return status === 'inProgress' ? 'Loading...' : (
+                <div>
+                    Here's some info to help you debug:
+                    <pre>state: {JSON.stringify(state, null, 2)}</pre>
+                    <pre>nodeName: {nodeName}</pre>
+                    <pre>status: {status}</pre>
+                </div>
+            );
+        },
     });
 
     useEffect(() => {
