@@ -20,7 +20,7 @@ interface ResearchState {
     sources: Record<string, Record<string, string | number>>; // Dictionary with string keys and nested dictionaries
     cited_sources: Record<string, string[]>; // Dictionary with string keys and an array of strings
     tool: string;
-    // messages: { [key: string]: unknown }[]; // Array of AnyMessage objects with potential additional properties
+    messages: { [key: string]: unknown }[]; // Array of AnyMessage objects with potential additional properties
 }
 
 const initialState: ResearchState = {
@@ -39,7 +39,7 @@ const initialState: ResearchState = {
     sources: {},
     cited_sources: {},
     tool: "",
-    // messages: []
+    messages: []
 };
 
 export default function HomePage() {
