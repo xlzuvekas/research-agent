@@ -2,7 +2,7 @@ from state import ResearchState
 from dotenv import load_dotenv
 import json
 import asyncio
-from typing import TypedDict, List, Annotated, Literal, Dict, Union, Optional
+from typing import TypedDict, List, Annotated, Literal, Dict, Union, Optional, cast
 from datetime import datetime
 from pydantic import BaseModel, Field
 import asyncio
@@ -93,26 +93,65 @@ class MasterAgent:
 
     # Invoke a model with research tools to gather data about the company
     def call_model(self, state: ResearchState):
+        # Check and cast the last message if needed
+        last_message = state['messages'][-1]
+        allowed_types = (AIMessage, SystemMessage, HumanMessage, ToolMessage)
+
+        if not isinstance(last_message, allowed_types):
+            # Cast the last message to HumanMessage if it's of an unrecognized type
+            last_message = HumanMessage(content=last_message.content)
+            state['messages'][-1] = last_message
+
         prompt = f"""Today's date is {datetime.now().strftime('%d/%m/%Y')}.\n
-    You are an expert researcher, with an objective to help users run comprehensive research tasks.
-    """
+        You are an expert researcher, with an objective to help users run comprehensive research tasks.
+        """
         messages = [SystemMessage(content=prompt)] + state['messages']
+
+        print("msgs:\n", messages)
         model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
         response = model.bind_tools(self.tools + [AskHuman]).invoke(messages)
+        response = cast(AIMessage, response)
         return {"messages": [response]}
 
     # Define the function that decides whether to continue research using tools or proceed to writing the report
     def should_continue(self, state: ResearchState) -> Literal["tools", "human", "end"]:
         messages = state['messages']
         last_message = messages[-1]
-        # If the LLM makes a tool call to ask the user a question, then we reroute to "human" node
-        if last_message.tool_calls and last_message.tool_calls[0]["name"] == "AskHuman":
-            return "human"
-        # Elif if the LLM makes a regular tool call, then we route to the "tools" node
-        elif last_message.tool_calls:
-            return "tools"
-        # Otherwise, we stop (reply to the user with current state of the research)
+        # # If the LLM makes a tool call to ask the user a question, then we reroute to "human" node
+        # if last_message.tool_calls and last_message.tool_calls[0]["name"] == "AskHuman":
+        #     return "human"
+        # # Elif if the LLM makes a regular tool call, then we route to the "tools" node
+        # elif last_message.tool_calls:
+        #     return "tools"
+        # # Otherwise, we stop (reply to the user with current state of the research)
+        # return "end"
+
+        # Only perform checks if the last message is an AIMessage
+        if isinstance(last_message, AIMessage):
+            # If the LLM makes a tool call to ask the user a question, reroute to "human" node
+            if last_message.tool_calls and last_message.tool_calls[0]["name"] == "AskHuman":
+                return "human"
+            # If the LLM makes a regular tool call, route to the "tools" node
+            elif last_message.tool_calls:
+                return "tools"
+
+        # If no conditions are met or if it's not an AIMessage, return "end" to stop
         return "end"
+
+#     # Define an async function to run your graph code
+#     async def run_graph(self):
+#         graph = self.graph
+#         messages = [
+#             HumanMessage(content="Please run research on Tavily company")
+#         ]
+#         async for s in graph.astream({"messages": messages}, stream_mode="values"):
+#             message = s["messages"][-1]
+#             if isinstance(message, tuple):
+#                 print(message)
+#             else:
+#                 message.pretty_print()
+# # Run the async function
+# asyncio.run(MasterAgent().run_graph())
 
 
 graph = MasterAgent().graph
