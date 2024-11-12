@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NODE_ENV=development next dev",
-    "remote-lgc-dev": "next dev",
+    "dev": "DEPLOYMENT=local next dev",
+    "remote-lgc-dev": "DEPLOYMENT=remote next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

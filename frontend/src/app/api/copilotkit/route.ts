@@ -9,7 +9,7 @@ import { NextRequest } from 'next/server';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const serviceAdapter = new OpenAIAdapter({ openai });
-const deploymentUrl = process.env.NODE_ENV === 'development' ? process.env.LOCAL_DEPLOYMENT_URL : process.env.DEPLOYMENT_URL
+const deploymentUrl = process.env.DEPLOYMENT === 'local' ? process.env.LOCAL_DEPLOYMENT_URL : process.env.DEPLOYMENT_URL
 const runtime = new CopilotRuntime({
     remoteEndpoints: [
         langGraphCloudEndpoint({
