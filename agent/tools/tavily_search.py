@@ -30,7 +30,6 @@ class TavilySearchInput(BaseModel):
 @tool("tavily_search", args_schema=TavilySearchInput, return_direct=True)
 async def tavily_search(sub_queries: List[TavilyQuery], state):
     """Perform searches for each sub-query using the Tavily search tool concurrently."""
-    # print("IN TAVILY SEARCH TOOL")
     # Define a coroutine function to perform a single search with error handling
     async def perform_search(itm):
         try:
@@ -62,6 +61,5 @@ async def tavily_search(sub_queries: List[TavilyQuery], state):
             sources[source['url']] = source
             tool_msg += json.dumps(source)
     state['sources'] = sources
-    # print("tool_msg:\n", tool_msg)
 
     return state, tool_msg
