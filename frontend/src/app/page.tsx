@@ -6,34 +6,16 @@ import Chat from "@/components/chat";
 import { useEffect, useRef, useState } from "react";
 import { GripVertical } from "lucide-react";
 import { useCoAgent, useCoAgentStateRender } from "@copilotkit/react-core";
+import { ResearchState } from "@/lib/types";
 
 const CHAT_MIN_WIDTH = 30;
 const CHAT_MAX_WIDTH = 50;
-
-interface ResearchState {
-    title: string;
-    outline: Record<string, unknown>;
-    intro: string;
-    sections: { title: string; content: string; idx: number }[]; // Array of objects with 'title', 'content', and 'idx'
-    conclusion: string;
-    footnotes: string;
-    sources: Record<string, Record<string, string | number>>; // Dictionary with string keys and nested dictionaries
-    cited_sources: Record<string, string[]>; // Dictionary with string keys and an array of strings
-    tool: string;
-    messages: { [key: string]: unknown }[]; // Array of AnyMessage objects with potential additional properties
-}
 
 const initialState: ResearchState = {
     title: "",
     outline: {},
     intro: "",
-    sections: [
-        // {
-        //     title: "",
-        //     content: "",
-        //     idx: 0
-        // }
-    ],
+    sections: [],
     conclusion: "",
     footnotes: "",
     sources: {},
