@@ -14,13 +14,14 @@ from langchain_core.runnables import RunnableConfig
 from tools.tavily_search import tavily_search
 from tools.tavily_extract import tavily_extract
 from tools.outline_writer import outline_writer
+from tools.section_writer import section_writer
 
 load_dotenv('.env')
 
 
 class MasterAgent:
     def __init__(self):
-        self.tools = [tavily_search, tavily_extract, outline_writer]
+        self.tools = [tavily_search, tavily_extract, outline_writer, section_writer]
         self.tools_by_name = {tool.name: tool for tool in self.tools}
 
         # Define a graph
@@ -94,9 +95,19 @@ class MasterAgent:
             last_message = HumanMessage(content=last_message.content)
             state['messages'][-1] = last_message
 
-        prompt = f"""Today's date is {datetime.now().strftime('%d/%m/%Y')}.\n
-        You are an expert researcher, with an objective to help users run comprehensive research tasks.
+        prompt = f"""Today's date is {datetime.now().strftime('%d/%m/%Y')}.
+
+        You are a highly skilled research agent, dedicated to helping users create comprehensive, well-sourced research reports. Your primary goal is to assist the user in producing a polished, professional report tailored to their needs.
+
+        When writing a report:
+        1. Use the search tool to start the research and gather information from credible online sources.
+        2. Use the extract tool to extract additional information from relevant URLs.
+        3. Use the outline tool to analyze the gathered information and organize it into a clear, logical outline. Break the content into meaningful sections that will guide the report structure.
+        4. Use the section writer tool to write a section of the report. At the first pase you should write the full report base on the outline. Ensure the report is well-written, properly sourced, and easy to understand. Avoid responding with the text of the report directly—always use the SectionWrite tool for the final product.
+
+        After completing the report, actively engage with the user to discuss next steps. For instance, ask if they need revisions, additional details, or further research. Keep the process interactive and collaborative.
         """
+        # If the user provides a research question or topic, proceed immediately without asking them to restate it. Your focus is to deliver high-quality insights efficiently and effectively.
 
         model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
         ainvoke_kwargs = {}

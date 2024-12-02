@@ -9,8 +9,8 @@ from langchain_openai import ChatOpenAI
 
 
 class OutlineWriterInput(BaseModel):
-    research_query: str = Field(description="research query")
-    state: Optional[Dict] = Field(description="state of the search")
+    research_query: str = Field(description="Research query")
+    state: Optional[Dict] = Field(description="State of the research")
 
 
 @tool("outline_writer", args_schema=OutlineWriterInput, return_direct=True)

@@ -8,8 +8,8 @@ tavily_client = AsyncTavilyClient()
 
 
 class TavilyExtractInput(BaseModel):
-    urls: List[str] = Field(description="list of a single or several URLs for extracting raw content to gather additional information")
-    state: Optional[Dict] = Field(description="state of the search")
+    urls: List[str] = Field(description="List of a single or several URLs for extracting raw content to gather additional information")
+    state: Optional[Dict] = Field(description="State of the research")
 
 
 @tool("tavily_extract", args_schema=TavilyExtractInput, return_direct=True)
@@ -19,10 +19,15 @@ async def tavily_extract(urls, state):
     try:
         response = await tavily_client.extract(urls=urls)
         results = response['results']
-        # match and add raw_content to urls in state
+        # Match and add raw_content to urls in state
         tool_msg = "Extracted raw content to gather additional information from the following sources:\n"
-        for url in results:
-            state["sources"][url]["raw_content"] = results[url]["raw_content"]
+        for itm in results:
+            url = itm['url']
+            raw_content = itm['raw_content']
+            if url in state["sources"]:
+                state["sources"][url]['raw_content'] = raw_content
+            else:
+                state["sources"][url] = {'raw_content': raw_content}
             tool_msg += f"{url}\n"
         return state, tool_msg
 
