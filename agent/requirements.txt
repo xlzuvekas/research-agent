@@ -7,6 +7,6 @@ langchain_openai
 langchain_core
 langgraph
 pydantic
-tavily-python
 python-dotenv
 json5
+copilotkit
