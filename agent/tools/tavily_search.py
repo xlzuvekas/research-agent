@@ -1,4 +1,5 @@
 import asyncio
+from copilotkit.langchain import copilotkit_emit_state
 from datetime import datetime
 from dotenv import load_dotenv
 import json
@@ -6,6 +7,7 @@ from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 from tavily import AsyncTavilyClient
 from typing import TypedDict, List, Annotated, Literal, Dict, Union, Optional
+from langchain_core.runnables import RunnableConfig
 
 load_dotenv('.env')
 tavily_client = AsyncTavilyClient()
@@ -42,8 +44,18 @@ async def tavily_search(sub_queries: List[TavilyQuery], state):
             print(f"Error occurred during search for query '{itm.query}': {str(e)}")
             return []
 
+    config = RunnableConfig()
+    # Log search queries
+    for query in sub_queries:
+        state["logs"] = state.get("logs", [])
+        state["logs"].append({
+            "message": f"Tavily search for {query.query}",
+            "done": False
+        })
+    await copilotkit_emit_state(config, state)
+
     # Run all the search tasks in parallel
-    search_tasks = [perform_search(itm) for itm in sub_queries]
+    search_tasks = [perform_search(query) for query in sub_queries]
     search_responses = await asyncio.gather(*search_tasks)
 
 

@@ -11,6 +11,8 @@ from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, START, END, add_messages
 from langchain_core.runnables import RunnableConfig
 
+from copilotkit.langchain import copilotkit_emit_state, copilotkit_customize_config
+
 from tools.tavily_search import tavily_search
 from tools.tavily_extract import tavily_extract
 from tools.outline_writer import outline_writer
@@ -52,10 +54,10 @@ class MasterAgent:
         self.graph = workflow.compile()
 
     # Define an async custom research tool node that access and updates the research state
-    async def tool_node(self, state: ResearchState):
+    async def tool_node(self, state: ResearchState, config: RunnableConfig):
 
         msgs = []
-        tool_response = {}
+        tool_state = {}
         for tool_call in state["messages"][-1].tool_calls:
             tool = self.tools_by_name[tool_call["name"]]
             tool_call["args"]["state"] = state  # update the state so the tool could access the state
@@ -64,7 +66,7 @@ class MasterAgent:
             new_state, tool_msg = await tool.ainvoke(tool_call["args"])
             tool_call["args"]["state"] = None
             msgs.append(ToolMessage(content=tool_msg, name=tool_call["name"], tool_call_id=tool_call["id"]))
-            tool_response = {
+            tool_state = {
                 "title": new_state.get("title", ""),
                 "outline": new_state.get("outline", ""),
                 "intro": new_state.get("intro", ""),
@@ -73,12 +75,12 @@ class MasterAgent:
                 "footnotes": new_state.get("footnotes", []),
                 "sources": new_state.get("sources", {}),
                 "cited_sources": new_state.get("cited_sources", {}),
-                "tool": new_state.get("tool", {})
+                "tool": new_state.get("tool", {}),
+                "messages": msgs
             }
+            await copilotkit_emit_state(config, tool_state)
 
-        tool_response["messages"] = msgs
-
-        return tool_response
+        return tool_state
 
     # We define a fake node to ask the human
     def ask_human(self, state: ResearchState):
@@ -86,6 +88,23 @@ class MasterAgent:
 
     # Invoke a model with research tools to gather data about the company
     async def call_model(self, state: ResearchState, config: RunnableConfig):
+        # config = copilotkit_customize_config(
+        #     config,
+        #
+        #     # this will stream the `set_outline` tool-call's `outline` argument, *as if* it was the `outline` state parameter.
+        #     # i.e.:
+        #     # the tool call: set_outline(outline: string)
+        #     # the state: { ..., outline: "..." }
+        #     emit_intermediate_state=[
+        #         {
+        #             "state_key": "outline",  # the name of the key on the agent state we want to interact with
+        #             "tool": "outline_writer",  # the name of the tool call
+        #             "tool_argument": "research_query",
+        #             # the name of the argument on the tool call to treat as intermediate state.
+        #         }
+        #     ]
+        # )
+
         # Check and cast the last message if needed
         last_message = state['messages'][-1]
         allowed_types = (AIMessage, SystemMessage, HumanMessage, ToolMessage)
