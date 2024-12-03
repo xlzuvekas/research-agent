@@ -9,14 +9,14 @@ importers:
   .:
     dependencies:
       '@copilotkit/react-core':
-        specifier: 1.4.0-feat-langgraph-cloud.0
-        version: 1.4.0-feat-langgraph-cloud.0(google-auth-library@8.9.0)(react-dom@19.0.0-rc-02c0e824-20241028(react@19.0.0-rc-02c0e824-20241028))(react@19.0.0-rc-02c0e824-20241028)
+        specifier: 1.4.0-pre-1-4-0.12
+        version: 1.4.0-pre-1-4-0.12(google-auth-library@8.9.0)(react-dom@19.0.0-rc-02c0e824-20241028(react@19.0.0-rc-02c0e824-20241028))(react@19.0.0-rc-02c0e824-20241028)
       '@copilotkit/react-ui':
-        specifier: 1.4.0-feat-langgraph-cloud.0
-        version: 1.4.0-feat-langgraph-cloud.0(@types/react@18.3.12)(google-auth-library@8.9.0)(react-dom@19.0.0-rc-02c0e824-20241028(react@19.0.0-rc-02c0e824-20241028))(react@19.0.0-rc-02c0e824-20241028)
+        specifier: 1.4.0-pre-1-4-0.12
+        version: 1.4.0-pre-1-4-0.12(@types/react@18.3.12)(google-auth-library@8.9.0)(react-dom@19.0.0-rc-02c0e824-20241028(react@19.0.0-rc-02c0e824-20241028))(react@19.0.0-rc-02c0e824-20241028)
       '@copilotkit/runtime':
-        specifier: 1.4.0-feat-langgraph-cloud.0
-        version: 1.4.0-feat-langgraph-cloud.0(class-validator@0.14.1)(google-auth-library@8.9.0)
+        specifier: 1.4.0-pre-1-4-0.12
+        version: 1.4.0-pre-1-4-0.12(class-validator@0.14.1)(google-auth-library@8.9.0)
       '@radix-ui/react-avatar':
         specifier: ^1.1.1
         version: 1.1.1(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@19.0.0-rc-02c0e824-20241028(react@19.0.0-rc-02c0e824-20241028))(react@19.0.0-rc-02c0e824-20241028)
@@ -106,27 +106,27 @@ packages:
     resolution: {integrity: sha512-FDSOghenHTiToteC/QRlv2q3DhPZ/oOXTBoirfWNx1Cx3TMVcGWQtMMmQcSvb/JjpNeGzx8Pq/b4fKEJuWm1sw==}
     engines: {node: '>=6.9.0'}
 
-  '@copilotkit/react-core@1.4.0-feat-langgraph-cloud.0':
-    resolution: {integrity: sha512-wngMV5RhWfFm479wgPiUWqQeK5zxFnMXdXc0HxT7HUY5RoXh5lvgamh2AwDiFsbJzC5ms+/BwhjCaX96LvB+qQ==}
+  '@copilotkit/react-core@1.4.0-pre-1-4-0.12':
+    resolution: {integrity: sha512-nHhVXibhVJy8TbNW1TR8GmxCCQPTT6ZFWUJLRGXLOLUl2JlNwaJWr+av/z1y/3lVriUaDpArB+U3RRDp1Y7MyA==}
     peerDependencies:
       react: ^18 || ^19 || ^19.0.0-rc
       react-dom: ^18 || ^19 || ^19.0.0-rc
 
-  '@copilotkit/react-ui@1.4.0-feat-langgraph-cloud.0':
-    resolution: {integrity: sha512-gJ3pK8aYyXAE9aoQ2P/0S3vsbm1tVg9wc7QwGmy2eo7JjX++81q7T+RBzPABbRtm0qRQ5O8c9r5L8tOpYqcFQw==}
+  '@copilotkit/react-ui@1.4.0-pre-1-4-0.12':
+    resolution: {integrity: sha512-R/tQIM8PC/Y9RoLMz+2DTy4vcWq8qh27NhBSXJNNbxx8Q19ECoKZ/7LvPPIcDs9BXEgCxK3mC1aTDvS0Cat+9Q==}
     peerDependencies:
       react: ^18 || ^19 || ^19.0.0-rc
 
-  '@copilotkit/runtime-client-gql@1.4.0-feat-langgraph-cloud.0':
-    resolution: {integrity: sha512-jL4H/GoEdU/ViGQcjmiWyO/t4rsyDSwhUYLb0+sKKYP25fdZ8T76f6awtha7/w7wVE1qLMucPv6fJD6cecVUNA==}
+  '@copilotkit/runtime-client-gql@1.4.0-pre-1-4-0.12':
+    resolution: {integrity: sha512-O0+PDDLgwCsS6BkQbQLpohMwKriX30wV6pos2D1d3L+foMcIUJe2zSycmJnbt5Y6ZjoejjigqfBbikhDtVg6SA==}
     peerDependencies:
       react: ^18 || ^19 || ^19.0.0-rc
 
-  '@copilotkit/runtime@1.4.0-feat-langgraph-cloud.0':
-    resolution: {integrity: sha512-BvzYp98x+Fryqqjc7sVKaHrb5PWLZhNK7f6+JgOr/zkrLOBD8xicj/J9s8+SLnw1/i23OEWiDmzAX5HXrJcZrg==}
+  '@copilotkit/runtime@1.4.0-pre-1-4-0.12':
+    resolution: {integrity: sha512-N58agdfj4l3gAjkCX9kA5Ozd1NqfrV0fzD3YA8JG4+bQ73iVYtdY+IAKGCRRfkAskZr2ANgyNTtZjlcCNrvXOQ==}
 
-  '@copilotkit/shared@1.4.0-feat-langgraph-cloud.0':
-    resolution: {integrity: sha512-MppMqa7fkUp6EUefbNaoKOQwuisyNlLRqa/Ulw10JBq2fR67z1TE0ArpXQ6M3rzEzsWpjHuGu9AQ+XzzO64tnQ==}
+  '@copilotkit/shared@1.4.0-pre-1-4-0.12':
+    resolution: {integrity: sha512-ZH/nvSFt0OM/X3EASDQpcWj3BLiY8OW6KJM7GOUUiqvsSReXv3M9Ne9MgPsDDDyEuu5D4XF+0/lJHNgfQujY1w==}
 
   '@emnapi/runtime@1.3.1':
     resolution: {integrity: sha512-kEBmG8KyqtxJZv+ygbEim+KCGtIq1fC22Ms3S4ziXmYKm8uyoLX0MHONVKwp+9opg390VaKRNt4a7A9NwmpNhw==}
@@ -3732,10 +3732,10 @@ snapshots:
     dependencies:
       regenerator-runtime: 0.14.1
 
-  '@copilotkit/react-core@1.4.0-feat-langgraph-cloud.0(google-auth-library@8.9.0)(react-dom@19.0.0-rc-02c0e824-20241028(react@19.0.0-rc-02c0e824-20241028))(react@19.0.0-rc-02c0e824-20241028)':
+  '@copilotkit/react-core@1.4.0-pre-1-4-0.12(google-auth-library@8.9.0)(react-dom@19.0.0-rc-02c0e824-20241028(react@19.0.0-rc-02c0e824-20241028))(react@19.0.0-rc-02c0e824-20241028)':
     dependencies:
-      '@copilotkit/runtime-client-gql': 1.4.0-feat-langgraph-cloud.0(google-auth-library@8.9.0)(react@19.0.0-rc-02c0e824-20241028)
-      '@copilotkit/shared': 1.4.0-feat-langgraph-cloud.0
+      '@copilotkit/runtime-client-gql': 1.4.0-pre-1-4-0.12(google-auth-library@8.9.0)(react@19.0.0-rc-02c0e824-20241028)
+      '@copilotkit/shared': 1.4.0-pre-1-4-0.12
       '@scarf/scarf': 1.3.0
       react: 19.0.0-rc-02c0e824-20241028
       react-dom: 19.0.0-rc-02c0e824-20241028(react@19.0.0-rc-02c0e824-20241028)
@@ -3848,11 +3848,11 @@ snapshots:
       - web-auth-library
       - ws
 
-  '@copilotkit/react-ui@1.4.0-feat-langgraph-cloud.0(@types/react@18.3.12)(google-auth-library@8.9.0)(react-dom@19.0.0-rc-02c0e824-20241028(react@19.0.0-rc-02c0e824-20241028))(react@19.0.0-rc-02c0e824-20241028)':
+  '@copilotkit/react-ui@1.4.0-pre-1-4-0.12(@types/react@18.3.12)(google-auth-library@8.9.0)(react-dom@19.0.0-rc-02c0e824-20241028(react@19.0.0-rc-02c0e824-20241028))(react@19.0.0-rc-02c0e824-20241028)':
     dependencies:
-      '@copilotkit/react-core': 1.4.0-feat-langgraph-cloud.0(google-auth-library@8.9.0)(react-dom@19.0.0-rc-02c0e824-20241028(react@19.0.0-rc-02c0e824-20241028))(react@19.0.0-rc-02c0e824-20241028)
-      '@copilotkit/runtime-client-gql': 1.4.0-feat-langgraph-cloud.0(google-auth-library@8.9.0)(react@19.0.0-rc-02c0e824-20241028)
-      '@copilotkit/shared': 1.4.0-feat-langgraph-cloud.0
+      '@copilotkit/react-core': 1.4.0-pre-1-4-0.12(google-auth-library@8.9.0)(react-dom@19.0.0-rc-02c0e824-20241028(react@19.0.0-rc-02c0e824-20241028))(react@19.0.0-rc-02c0e824-20241028)
+      '@copilotkit/runtime-client-gql': 1.4.0-pre-1-4-0.12(google-auth-library@8.9.0)(react@19.0.0-rc-02c0e824-20241028)
+      '@copilotkit/shared': 1.4.0-pre-1-4-0.12
       '@headlessui/react': 2.2.0(react-dom@19.0.0-rc-02c0e824-20241028(react@19.0.0-rc-02c0e824-20241028))(react@19.0.0-rc-02c0e824-20241028)
       react: 19.0.0-rc-02c0e824-20241028
       react-markdown: 8.0.7(@types/react@18.3.12)(react@19.0.0-rc-02c0e824-20241028)
@@ -3969,10 +3969,10 @@ snapshots:
       - web-auth-library
       - ws
 
-  '@copilotkit/runtime-client-gql@1.4.0-feat-langgraph-cloud.0(google-auth-library@8.9.0)(react@19.0.0-rc-02c0e824-20241028)':
+  '@copilotkit/runtime-client-gql@1.4.0-pre-1-4-0.12(google-auth-library@8.9.0)(react@19.0.0-rc-02c0e824-20241028)':
     dependencies:
-      '@copilotkit/runtime': 1.4.0-feat-langgraph-cloud.0(class-validator@0.14.1)(google-auth-library@8.9.0)
-      '@copilotkit/shared': 1.4.0-feat-langgraph-cloud.0
+      '@copilotkit/runtime': 1.4.0-pre-1-4-0.12(class-validator@0.14.1)(google-auth-library@8.9.0)
+      '@copilotkit/shared': 1.4.0-pre-1-4-0.12
       '@urql/core': 5.0.8(graphql@16.9.0)
       class-transformer: 0.5.1
       class-validator: 0.14.1
@@ -4089,10 +4089,10 @@ snapshots:
       - web-auth-library
       - ws
 
-  '@copilotkit/runtime@1.4.0-feat-langgraph-cloud.0(class-validator@0.14.1)(google-auth-library@8.9.0)':
+  '@copilotkit/runtime@1.4.0-pre-1-4-0.12(class-validator@0.14.1)(google-auth-library@8.9.0)':
     dependencies:
       '@anthropic-ai/sdk': 0.27.3
-      '@copilotkit/shared': 1.4.0-feat-langgraph-cloud.0
+      '@copilotkit/shared': 1.4.0-pre-1-4-0.12
       '@graphql-yoga/plugin-defer-stream': 3.8.0(graphql-yoga@5.8.0(graphql@16.9.0))(graphql@16.9.0)
       '@langchain/community': 0.0.53(google-auth-library@8.9.0)(openai@4.70.2(zod@3.23.8))
       '@langchain/core': 0.3.17(openai@4.70.2(zod@3.23.8))
@@ -4223,7 +4223,7 @@ snapshots:
       - web-auth-library
       - ws
 
-  '@copilotkit/shared@1.4.0-feat-langgraph-cloud.0':
+  '@copilotkit/shared@1.4.0-pre-1-4-0.12':
     dependencies:
       '@segment/analytics-node': 2.2.0
       chalk: 4.1.2
