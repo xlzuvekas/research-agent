@@ -3,10 +3,11 @@
 import Toolbar from "@/components/toolbar";
 import DocumentViewer from "@/components/document-viewer";
 import Chat from "@/components/chat";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { GripVertical } from "lucide-react";
 import { useCoAgent, useCoAgentStateRender } from "@copilotkit/react-core";
 import { ResearchState } from "@/lib/types";
+import { Progress } from "@/components/progress";
 
 const CHAT_MIN_WIDTH = 30;
 const CHAT_MAX_WIDTH = 50;
@@ -21,7 +22,8 @@ const initialState: ResearchState = {
     sources: {},
     cited_sources: {},
     tool: "",
-    messages: []
+    messages: [],
+    logs: []
 };
 
 export default function HomePage() {
@@ -34,25 +36,13 @@ export default function HomePage() {
         initialState,
     });
 
-    console.log(state)
-
-    useCoAgentStateRender({
+    useCoAgentStateRender<ResearchState>({
         name: 'agent',
-        render: ({ state, nodeName, status }) => {
-            console.log({
-                state,
-                nodeName,
-                status,
-            })
-
-            return status === 'inProgress' ? 'Loading...' : (
-                <div>
-                    Here's some info to help you debug:
-                    <pre>state: {JSON.stringify(state, null, 2)}</pre>
-                    <pre>nodeName: {nodeName}</pre>
-                    <pre>status: {status}</pre>
-                </div>
-            );
+        render: ({ state }) => {
+            if (!state.logs || state.logs.length === 0) {
+                return null;
+            }
+            return <Progress logs={state.logs} />;
         },
     });
 
@@ -88,6 +78,33 @@ export default function HomePage() {
             document.removeEventListener('mouseup', stopDragging)
         }
     }, [])
+    const {
+        sections,
+        title,
+        intro,
+        outline,
+        footnotes,
+        conclusion,
+        cited_sources,
+    } = state
+
+    const doc = useMemo(() => ({
+        sections,
+        title,
+        intro,
+        outline,
+        footnotes,
+        conclusion,
+        cited_sources
+    }), [
+        sections,
+        title,
+        intro,
+        outline,
+        footnotes,
+        conclusion,
+        cited_sources
+    ])
 
     return (
         <div
@@ -99,7 +116,13 @@ export default function HomePage() {
                 {/* Main Chat Window */}
                 <div className="flex h-full" ref={containerRef}>
                     <div style={{width: `${chatWidth}%`}}>
-                        <Chat/>
+                        <Chat
+                            onSubmitMessage={async () => {
+                                // clear the logs before starting the new research
+                                setState({ ...state, logs: [] });
+                                await new Promise((resolve) => setTimeout(resolve, 30));
+                            }}
+                        />
                     </div>
 
                     <div
@@ -110,7 +133,7 @@ export default function HomePage() {
                     </div>
 
                     {/* Document Viewer */}
-                    <DocumentViewer />
+                    <DocumentViewer doc={doc} />
                 </div>
             </div>
         </div>

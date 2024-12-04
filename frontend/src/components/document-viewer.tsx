@@ -6,6 +6,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { Document, Section as TSection } from "@/lib/types";
+import { ReactNode } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function DocumentOptions() {
     return (
@@ -37,32 +40,71 @@ function DocumentOptions() {
     )
 }
 
-export default function DocumentViewer() {
+function Footnotes({}: Pick<Document, 'footnotes'>) {
+    return (
+        <div>
+            <h4 className="text-2xl font-semibold mt-8 mb-4">Footnotes</h4>
+            <ol className="list-decimal pl-6 text-sm">
+                <li className="mb-2">Smith, J. (2022). "AI in Scientific Research: A Comprehensive Review." Journal of
+                    AI Applications, 15(2), 45-62.
+                </li>
+                <li className="mb-2">Johnson, A., & Lee, B. (2021). "Machine Learning Techniques for Big Data Analysis
+                    in Research." Data Science Quarterly, 8(4), 112-128.
+                </li>
+                <li className="mb-2">Brown, C. et al. (2023). "Automated Literature Review: A Game Changer for
+                    Researchers." AI in Academia, 6(1), 78-95.
+                </li>
+                <li className="mb-2">Garcia, M., & Wong, R. (2022). "Predictive Modeling in Scientific Research: Case
+                    Studies and Best Practices." Computational Science Review, 19(3), 201-220.
+                </li>
+                <li className="mb-2">Taylor, S. (2023). "The Human-AI Collaboration in Modern Research: Challenges and
+                    Opportunities." Future of Science Journal, 7(2), 156-173.
+                </li>
+            </ol>
+        </div>
+    )
+}
+
+function Section({
+    idx,
+    title,
+    content
+}: TSection) {
+    return (
+        <div id={`${idx}`}>
+            <h4>{title}</h4>
+            <p>{content}</p>
+        </div>
+    )
+}
+
+export default function DocumentViewer({
+    doc
+}: { doc: Document }) {
+
     return (
         <div className="flex-1 p-4 flex flex-col h-full">
-            <DocumentOptions />
+            <DocumentOptions/>
 
             <div
                 className="bg-white shadow-sm p-6 overflow-auto border border-black/10 flex-grow max-h-[75%]">
-                <h3 className="text-xl font-semibold mb-4">Document Title</h3>
-                <div className="prose prose-sm prose-stone">
-                    <p>This is the content of the document. It&#39;s always visible and elevated within its section.</p>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget aliquam
-                        ultricies, nunc nisl aliquet nunc, vitae aliquam nisl nunc vitae nisl.</p>
-                    <h4>Section 1</h4>
-                    <p>Phasellus ac dolor vel felis sollicitudin bibendum. Fusce tincidunt, nisl eget aliquam ultricies,
-                        nunc nisl aliquet nunc, vitae aliquam nisl nunc vitae nisl.</p>
-                    <h4>Section 2</h4>
-                    <p>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec
-                        velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula.</p>
-                    <ul>
-                        <li>Item 1</li>
-                        <li>Item 2</li>
-                        <li>Item 3</li>
-                    </ul>
-                    <p>Curabitur aliquet quam id dui posuere blandit. Vivamus magna justo, lacinia eget consectetur sed,
-                        convallis at tellus.</p>
-                </div>
+                {doc.sections?.length ? (
+                    <>
+                        <h3 className="text-xl font-semibold mb-4">{doc.title}</h3>
+                        <div className="prose prose-sm prose-stone">
+                            {doc.sections.map(({title, content, idx}) => (
+                                <Section key={idx} idx={idx} title={title} content={content} />
+                            ))}
+                        </div>
+                    </>
+                ) : (
+                    <div className="font-noto flex items-center justify-center w-full h-full">
+                        <p className="relative -top-5">
+                            Interact with the research agent and your research document will show up here.
+                        </p>
+                    </div>
+                )}
+                <Footnotes footnotes={doc.footnotes} />
             </div>
         </div>
     )
