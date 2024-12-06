@@ -7,13 +7,12 @@ import {
 import { ChevronDown } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Document, Section as TSection } from "@/lib/types";
-import { ReactNode } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
 
-function DocumentOptions() {
+function DocumentOptions({ onZoomChange }: { onZoomChange: (value: string) => void }) {
     return (
         <div className="flex justify-center items-center mb-4 font-noto">
-            <div className="inline-flex bg-[#8B4513]/5 rounded-md shadow-md p-1">
+            <div className="inline-flex bg-[#F5F0EA] rounded-md shadow-md p-1">
                 <DropdownMenu>
                     <DropdownMenuTrigger
                         className="border border-black/10 inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-white hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 mr-2">
@@ -26,13 +25,14 @@ function DocumentOptions() {
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                <Select defaultValue="100">
+                <Select defaultValue="100" onValueChange={onZoomChange}>
                     <SelectTrigger className="w-[100px] bg-white">
                         <SelectValue placeholder="View"/>
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="100">100%</SelectItem>
                         <SelectItem value="75">75%</SelectItem>
+                        <SelectItem value="50">50%</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -81,21 +81,45 @@ function Section({
 export default function DocumentViewer({
     doc
 }: { doc: Document }) {
+    const [currentPage, setCurrentPage] = useState(0);
+    const [zoomLevel, setZoomLevel] = useState(100);
+    const sectionsPerPage = 2;
+
+    const startIndex = currentPage * sectionsPerPage;
+    const selectedSections = doc.sections?.slice(startIndex, startIndex + sectionsPerPage) || [];
+
+    const totalPages = Math.ceil((doc.sections?.length || 0) / sectionsPerPage);
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages - 1) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const handlePrevPage = () => {
+        if (currentPage > 0) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handleZoomChange = (value: string | number) => {
+        setZoomLevel(Number(value));
+    };
 
     return (
         <div className="flex-1 p-4 flex flex-col h-full">
-            <DocumentOptions/>
+            <DocumentOptions onZoomChange={handleZoomChange}/>
 
-            <div
-                className="bg-white shadow-sm p-6 overflow-auto border border-black/10 flex-grow max-h-[75%]">
-                {doc.sections?.length ? (
+            <div className={`bg-white shadow-sm p-6 overflow-auto border border-black/10 flex-grow max-h-[75%] w-[210mm] h-[297mm] mx-auto`} style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top left' }}>
+                {selectedSections.length ? (
                     <>
                         <h3 className="text-xl font-semibold mb-4">{doc.title}</h3>
                         <div className="prose prose-sm prose-stone">
-                            {doc.sections.map(({title, content, idx}) => (
+                            {selectedSections.map(({title, content, idx}) => (
                                 <Section key={idx} idx={idx} title={title} content={content} />
                             ))}
                         </div>
+                        <Footnotes footnotes={doc.footnotes} />
                     </>
                 ) : (
                     <div className="font-noto flex items-center justify-center w-full h-full">
@@ -104,7 +128,31 @@ export default function DocumentViewer({
                         </p>
                     </div>
                 )}
-                <Footnotes footnotes={doc.footnotes} />
+            </div>
+            <div className="flex items-center justify-between mt-4 px-4">
+                <div className="flex items-center gap-2">
+                    <button 
+                        onClick={handlePrevPage} 
+                        disabled={currentPage === 0}
+                        className="px-3 py-1 bg-gray-100 rounded disabled:opacity-50"
+                    >
+                        Previous
+                    </button>
+                    <button 
+                        onClick={handleNextPage} 
+                        disabled={currentPage === totalPages - 1}
+                        className="px-3 py-1 bg-gray-100 rounded disabled:opacity-50"
+                    >
+                        Next
+                    </button>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <span>Page {currentPage + 1} of {totalPages}</span>
+                    <span>•</span>
+                    <span>{Math.min((currentPage + 1) * sectionsPerPage, doc.sections?.length || 0)} of {doc.sections?.length || 0} sections</span>
+                    <span>•</span>
+                    <span>{zoomLevel}%</span>
+                </div>
             </div>
         </div>
     )

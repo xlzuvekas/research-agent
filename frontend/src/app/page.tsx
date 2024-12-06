@@ -5,36 +5,20 @@ import DocumentViewer from "@/components/document-viewer";
 import Chat from "@/components/chat";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { GripVertical } from "lucide-react";
-import { useCoAgent, useCoAgentStateRender } from "@copilotkit/react-core";
+import { useCoAgentStateRender } from "@copilotkit/react-core";
 import { ResearchState } from "@/lib/types";
 import { Progress } from "@/components/progress";
+import SourcesModal from "@/components/resource-modal";
+import { useResearch } from "@/components/research-context";
 
 const CHAT_MIN_WIDTH = 30;
 const CHAT_MAX_WIDTH = 50;
-
-const initialState: ResearchState = {
-    title: "",
-    outline: {},
-    intro: "",
-    sections: [],
-    conclusion: "",
-    footnotes: "",
-    sources: {},
-    cited_sources: {},
-    tool: "",
-    messages: [],
-    logs: []
-};
 
 export default function HomePage() {
     const [chatWidth, setChatWidth] = useState(50) // Initial chat width in percentage
     const dividerRef = useRef<HTMLDivElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
-
-    const { state, setState } = useCoAgent<ResearchState>({
-        name: 'agent',
-        initialState,
-    });
+    const { state, setResearchState } = useResearch()
 
     useCoAgentStateRender<ResearchState>({
         name: 'agent',
@@ -111,15 +95,15 @@ export default function HomePage() {
             className="h-screen bg-[#FAF9F6] text-[#3D2B1F] font-lato">
             <div className="grid h-full" style={{ gridTemplateColumns: 'auto 1fr' }}>
                 {/* Toolbar */}
-                <Toolbar/>
+                <Toolbar />
 
                 {/* Main Chat Window */}
-                <div className="flex h-full" ref={containerRef}>
+                <div className="flex h-full overflow-hidden" ref={containerRef}>
                     <div style={{width: `${chatWidth}%`}}>
                         <Chat
                             onSubmitMessage={async () => {
                                 // clear the logs before starting the new research
-                                setState({ ...state, logs: [] });
+                                setResearchState({ ...state, logs: [] });
                                 await new Promise((resolve) => setTimeout(resolve, 30));
                             }}
                         />
@@ -136,6 +120,7 @@ export default function HomePage() {
                     <DocumentViewer doc={doc} />
                 </div>
             </div>
+            <SourcesModal />
         </div>
     );
 }

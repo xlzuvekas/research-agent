@@ -1,7 +1,13 @@
 
 export interface Section { title: string; content: string; idx: number }
 
-export type Source = Record<string, string | number>
+export interface Source {
+    content: string;
+    published_date: string;
+    score: number;
+    title: string;
+    url: string;
+}
 export type Sources = Record<string, Source>
 
 export interface Log {
