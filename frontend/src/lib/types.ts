@@ -1,5 +1,5 @@
 
-export interface Section { title: string; content: string; idx: number }
+export interface Section { title: string; content: string; idx: number; footnotes?: string; id: string }
 
 export interface Source {
     content: string;

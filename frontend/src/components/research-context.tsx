@@ -32,17 +32,23 @@ export function ResearchProvider({ children }: { children: ReactNode }) {
     const [sourcesModalOpen, setSourcesModalOpen] = useState<boolean>(false)
     const { state: coAgentState, setState: setCoAgentsState } = useCoAgent<ResearchState>({
         name: 'agent',
-        initialState,
+        initialState: {},
     });
     // @ts-expect-error -- sdafsd
     const [localStorageState, setLocalStorageState] = useLocalStorage<ResearchState>('research', null);
 
     useEffect(() => {
-        if (localStorageState && !coAgentState) {
+        const coAgentsStateEmpty = Object.keys(coAgentState).length < 1
+        const localStorageStateEmpty = localStorageState == null || Object.keys(localStorageState).length < 1
+        if (!localStorageStateEmpty && coAgentsStateEmpty) {
             setCoAgentsState(localStorageState)
             return;
         }
-        if (coAgentState && JSON.stringify(localStorageState) !== JSON.stringify(coAgentState)) {
+        if (!coAgentsStateEmpty && localStorageStateEmpty) {
+            setLocalStorageState(coAgentState)
+            return;
+        }
+        if (!localStorageStateEmpty && !coAgentsStateEmpty && JSON.stringify(localStorageState) !== JSON.stringify(coAgentState)) {
             setLocalStorageState(coAgentState)
             return;
         }

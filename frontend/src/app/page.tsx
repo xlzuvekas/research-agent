@@ -1,15 +1,15 @@
 'use client'
 
 import Toolbar from "@/components/toolbar";
-import DocumentViewer from "@/components/document-viewer";
 import Chat from "@/components/chat";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GripVertical } from "lucide-react";
 import { useCoAgentStateRender } from "@copilotkit/react-core";
-import { ResearchState } from "@/lib/types";
+import { ResearchState, Section } from "@/lib/types";
 import { Progress } from "@/components/progress";
 import SourcesModal from "@/components/resource-modal";
 import { useResearch } from "@/components/research-context";
+import { DocumentsView } from "@/components/documents-view";
 
 const CHAT_MIN_WIDTH = 30;
 const CHAT_MAX_WIDTH = 50;
@@ -64,31 +64,9 @@ export default function HomePage() {
     }, [])
     const {
         sections,
-        title,
-        intro,
-        outline,
-        footnotes,
-        conclusion,
-        cited_sources,
     } = state
 
-    const doc = useMemo(() => ({
-        sections,
-        title,
-        intro,
-        outline,
-        footnotes,
-        conclusion,
-        cited_sources
-    }), [
-        sections,
-        title,
-        intro,
-        outline,
-        footnotes,
-        conclusion,
-        cited_sources
-    ])
+    const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
 
     return (
         <div
@@ -117,7 +95,11 @@ export default function HomePage() {
                     </div>
 
                     {/* Document Viewer */}
-                    <DocumentViewer doc={doc} />
+                    <DocumentsView
+                        sections={sections ?? []}
+                        selectedSection={sections?.find(s => s.id === selectedSectionId)}
+                        onSelectSection={setSelectedSectionId}
+                    />
                 </div>
             </div>
             <SourcesModal />

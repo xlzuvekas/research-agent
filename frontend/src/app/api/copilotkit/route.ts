@@ -2,7 +2,7 @@ import {
     CopilotRuntime,
     OpenAIAdapter,
     copilotRuntimeNextJSAppRouterEndpoint,
-    langGraphCloudEndpoint,
+    langGraphPlatformEndpoint,
 } from '@copilotkit/runtime';
 import OpenAI from 'openai';
 import { NextRequest } from 'next/server';
@@ -12,7 +12,7 @@ const serviceAdapter = new OpenAIAdapter({ openai });
 const deploymentUrl = process.env.DEPLOYMENT === 'local' ? process.env.LOCAL_DEPLOYMENT_URL : process.env.DEPLOYMENT_URL
 const runtime = new CopilotRuntime({
     remoteEndpoints: [
-        langGraphCloudEndpoint({
+        langGraphPlatformEndpoint({
             deploymentUrl: deploymentUrl!,
             langsmithApiKey: process.env.LANGSMITH_API_KEY!,
             agents: [{
