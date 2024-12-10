@@ -50,7 +50,7 @@ export function DocumentsView({ sections, selectedSection, onSelectSection }: Do
                         onSelect={onSelectSection}
                     />
                 ) : (
-                    <DocumentViewer zoomLevel={zoomLevel} placeholder="Click on one of the sections to the left to view and edit" />
+                    <DocumentViewer zoomLevel={zoomLevel} placeholder="Pick a section from the sections tab to the right, to view and edit" />
                 )}
 
                 {/* Scrollable thumbnails on the right */}
