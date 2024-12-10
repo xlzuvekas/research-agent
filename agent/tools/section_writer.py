@@ -6,6 +6,11 @@ from langchain_community.adapters.openai import convert_openai_messages
 from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
+import random
+import string
+
+def generate_random_id(length=6):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
 class SectionWriterInput(BaseModel):
     research_query: str = Field(description="The research query or topic for the section.")
@@ -56,6 +61,7 @@ async def section_writer(research_query, section_title, idx, state):
     # Parse the JSON response and update the state
     section = json.loads(response)
     section['idx'] = idx
+    section['id'] = generate_random_id()
     state["sections"].append(section)
 
     tool_msg = f"Wrote the {section_title} Section, idx: {idx}"
