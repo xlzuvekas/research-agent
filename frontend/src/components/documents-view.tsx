@@ -38,7 +38,7 @@ export function DocumentsView({ sections, selectedSection, onSelectSection }: Do
     ), [sections, selectedSection?.id]);
 
     return (
-        <div className="flex flex-col flex-1 overflow-y-hidden h-full py-4 pl-2">
+        <div className="flex flex-col flex-1 overflow-y-hidden h-full p-4">
             <DocumentOptions onZoomChange={handleZoomChange}/>
 
             <div className="flex flex-1">
