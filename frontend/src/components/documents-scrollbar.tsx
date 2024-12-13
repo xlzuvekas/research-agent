@@ -6,11 +6,13 @@ import { ChevronLeft } from "lucide-react";
 interface DocumentsScrollbarProps {
     sections: Section[];
     onSelectSection: (sectionId: string) => void;
+    selectedSectionId?: string;
 }
 
 export function DocumentsScrollbar({
     sections,
     onSelectSection,
+    selectedSectionId
 }: DocumentsScrollbarProps) {
     return (
         <div className="group fixed right-0 top-0 h-full transition-transform duration-300 transform translate-x-full hover:translate-x-0 z-10">
@@ -24,6 +26,7 @@ export function DocumentsScrollbar({
                         section={section}
                         zoomLevel={30}
                         compact
+                        highlight={selectedSectionId === section.id}
                         onSelect={onSelectSection}
                     />
                 ))}

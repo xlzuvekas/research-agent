@@ -1,5 +1,5 @@
 import { Section } from "@/lib/types";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import DocumentOptions from "@/components/document-options";
 import { DocumentsScrollbar } from "@/components/documents-scrollbar";
 import { DocumentViewer } from "@/components/document-viewer";
@@ -33,10 +33,6 @@ export function DocumentsView({ sections, selectedSection, onSelectSection }: Do
         setZoomLevel(Number(value));
     };
 
-    const unselectedSections = useMemo(() => (
-        sections.filter(section => section.id !== selectedSection?.id)
-    ), [sections, selectedSection?.id]);
-
     return (
         <div className="flex flex-col flex-1 overflow-y-hidden h-full p-4">
             <DocumentOptions onZoomChange={handleZoomChange}/>
@@ -54,7 +50,7 @@ export function DocumentsView({ sections, selectedSection, onSelectSection }: Do
                 )}
 
                 {/* Scrollable thumbnails on the right */}
-                <DocumentsScrollbar sections={unselectedSections} onSelectSection={onSelectSection} />
+                <DocumentsScrollbar sections={sections} selectedSectionId={selectedSection?.id} onSelectSection={onSelectSection} />
             </div>
 
             <div className="flex items-center justify-between mt-4 px-4">

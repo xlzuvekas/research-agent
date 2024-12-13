@@ -10,9 +10,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@copilotkit/react-core": "1.4.0",
-    "@copilotkit/react-ui": "1.4.0",
-    "@copilotkit/runtime": "1.4.0",
+    "@copilotkit/react-core": "1.4.3",
+    "@copilotkit/react-ui": "1.4.3",
+    "@copilotkit/runtime": "1.4.3",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-dropdown-menu": "^2.1.2",

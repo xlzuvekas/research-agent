@@ -26,11 +26,11 @@ export default function SourcesModal() {
     return (
         <Dialog open={sourcesModalOpen} onOpenChange={setSourcesModalOpen}>
             <DialogContent className="sm:max-w-[625px] bg-[#F5F0EA]">
+                <DialogHeader>
+                    <DialogTitle>Sources</DialogTitle>
+                </DialogHeader>
                 {filteredSources.length > 0 ? (
                     <>
-                        <DialogHeader>
-                            <DialogTitle>Sources</DialogTitle>
-                        </DialogHeader>
                         <div className="flex justify-between items-center mb-4">
                             <Input
                                 type="text"

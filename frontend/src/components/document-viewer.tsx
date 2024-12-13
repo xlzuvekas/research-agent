@@ -6,6 +6,7 @@ interface DocumentViewerProps {
     section?: TSection;
     zoomLevel: number,
     compact?: boolean;
+    highlight?: boolean;
     onSelect?: (sectionId: string) => void;
     placeholder?: string;
 }
@@ -14,6 +15,7 @@ export function DocumentViewer({
     section,
     zoomLevel,
     compact = false,
+    highlight = false,
     onSelect,
     placeholder,
 }: DocumentViewerProps) {
@@ -42,7 +44,7 @@ export function DocumentViewer({
         <div
             key={id}
             className={`bg-white shadow-sm p-6 overflow-auto border border-black/10 transition-all duration-200 ${
-                compact ? 'shadow hover:scale-105' : 'shadow-lg z-10 flex-1'
+                compact ? `shadow hover:scale-105 ${highlight ? 'border-[var(--primary)]' : ''}` : 'shadow-lg z-10 flex-1'
             }`}
             style={scalingStyle}
             {...(compact ? {
