@@ -12,6 +12,8 @@ from langgraph.graph import MessagesState
 
 class ResearchState(MessagesState):
     title: str
+    proposal: Dict[str, List[str]]  # Stores proposed structure before user approval
+    structure: Dict[str, List[str]]  # Finalized structure chosen by the user
     outline: dict
     intro: str
     sections: List[dict]  # list of dicts with 'title','content',and 'idx'

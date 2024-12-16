@@ -1,4 +1,3 @@
-
 export interface Section { title: string; content: string; idx: number; footnotes?: string; id: string }
 
 export interface Source {
@@ -15,10 +14,34 @@ export interface Log {
     done: boolean;
 }
 
+export interface ProposalSection {
+    title: string;
+    description: string
+    approved: boolean
+}
+
+export enum ProposalSectionName {
+    Sections = "sections",
+    KeyPoints = "key_points",
+    DocumentFeatures = "document_features"
+}
+
+export type IProposalItem = Record<ProposalSectionName, ProposalSection> & { description: string }
+
+export interface Proposal {
+    [ProposalSectionName.Sections]: IProposalItem
+    [ProposalSectionName.KeyPoints]: IProposalItem
+    [ProposalSectionName.DocumentFeatures]: IProposalItem
+    timestamp: string
+    approved: boolean
+}
+
 // This interface corresponds to the state defined in agent/state.py
 export interface ResearchState {
     title: string;
     outline: Record<string, unknown>;
+    proposal: Proposal;
+    structure: Record<string, unknown>;
     intro: string;
     sections: Section[]; // Array of objects with 'title', 'content', and 'idx'
     conclusion: string;

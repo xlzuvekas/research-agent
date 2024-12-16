@@ -33,6 +33,7 @@ class TavilySearchInput(BaseModel):
 async def tavily_search(sub_queries: List[TavilyQuery], state):
     """Perform searches for each sub-query using the Tavily search tool concurrently."""
     # Define a coroutine function to perform a single search with error handling
+
     async def perform_search(itm):
         try:
             # Add date to the query as we need the most recent results

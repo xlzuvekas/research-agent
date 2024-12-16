@@ -15,8 +15,10 @@ export default function useLocalStorage<T>(key: string, initialValue: T): [T, Di
                 return initialValue;
             }
             try {
-                const item = window.localStorage.getItem(key);
-                return item ? JSON.parse(item) as T : initialValue;
+                // TODO: re-enable
+                // const item = window.localStorage.getItem(key);
+                // return item ? JSON.parse(item) as T : initialValue;
+                return initialValue
             } catch (error) {
                 console.error(error);
                 return initialValue;

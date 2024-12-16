@@ -1,4 +1,3 @@
-from state import ResearchState
 from dotenv import load_dotenv
 import json
 import asyncio
@@ -10,13 +9,16 @@ from langchain_core.messages import AnyMessage, AIMessage, SystemMessage, HumanM
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, START, END, add_messages
 from langchain_core.runnables import RunnableConfig
+from langgraph.types import Command
 
 from copilotkit.langchain import copilotkit_emit_state, copilotkit_customize_config
 
-from tools.tavily_search import tavily_search
-from tools.tavily_extract import tavily_extract
-from tools.outline_writer import outline_writer
-from tools.section_writer import section_writer
+from agent.state import ResearchState
+from agent.tools.tavily_search import tavily_search
+from agent.tools.tavily_extract import tavily_extract
+from agent.tools.outline_writer import outline_writer
+from agent.structure_planner import structure_planner
+from agent.tools.section_writer import section_writer
 
 load_dotenv('.env')
 
@@ -30,11 +32,13 @@ class MasterAgent:
         workflow = StateGraph(ResearchState)
 
         # Add nodes
+        workflow.add_node("start_node", self.start_node)
+        workflow.add_node("planner", structure_planner)
         workflow.add_node("agent", self.call_model)
         workflow.add_node("tools", self.tool_node)
 
         # Set the entrypoint as route_query
-        workflow.set_entry_point("agent")
+        workflow.set_entry_point("start_node")
 
         # Determine which node is called next
         workflow.add_conditional_edges(
@@ -51,11 +55,11 @@ class MasterAgent:
         workflow.add_edge("agent", END)
 
         # Compile the graph and save it
-        self.graph = workflow.compile()
+        self.graph = workflow.compile(interrupt_after=["planner"])
 
     # Define an async custom research tool node that access and updates the research state
     async def tool_node(self, state: ResearchState, config: RunnableConfig):
-
+        config = copilotkit_customize_config(config, emit_messages=False)
         msgs = []
         tool_state = {}
         for tool_call in state["messages"][-1].tool_calls:
@@ -72,9 +76,11 @@ class MasterAgent:
                 "intro": new_state.get("intro", ""),
                 "sections": new_state.get("sections", []),
                 "conclusion": new_state.get("conclusion", ""),
-                "footnotes": new_state.get("footnotes", []),
+                "footnotes": new_state.get("footnotes", None),
                 "sources": new_state.get("sources", {}),
-                "cited_sources": new_state.get("cited_sources", {}),
+                "cited_sources": new_state.get("cited_sources", None),
+                "proposal": new_state.get("proposal", {}),
+                "structure": new_state.get("structure", {}),
                 "tool": new_state.get("tool", {}),
                 "messages": msgs
             }
@@ -88,6 +94,7 @@ class MasterAgent:
 
     # Invoke a model with research tools to gather data about the company
     async def call_model(self, state: ResearchState, config: RunnableConfig):
+        print("call_model")
         # config = copilotkit_customize_config(
         #     config,
         #
@@ -142,6 +149,17 @@ class MasterAgent:
         response = cast(AIMessage, response)
 
         return {"messages": response}
+
+    async def start_node(self, state: ResearchState):
+        print("start_node")
+        if state.get("proposal", {}).get("approved", False):
+            goto = 'agent'
+        else:
+            goto = 'planner'
+
+        return Command(
+            goto=goto
+        )
 
     # Define the function that decides whether to continue research using tools or proceed to writing the report
     def should_continue(self, state: ResearchState) -> Literal["tools", "human", "end"]:

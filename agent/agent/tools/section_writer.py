@@ -23,8 +23,10 @@ class SectionWriterInput(BaseModel):
 async def section_writer(research_query, section_title, idx, state):
     """Writes a specific section of a research report based on the query, section title, and provided sources."""
 
-
+    structure = state.get("structure", {})
     sources = state.get("sources").values()
+
+    print('section_writer')
 
     # Define the system and user prompts
     prompt = [{
@@ -41,6 +43,7 @@ async def section_writer(research_query, section_title, idx, state):
             f"Research Query: {research_query}\n"
             f"Section Title: {section_title}\n"
             f"Sources:\n{sources}\n\n"
+            f"Structure:\n{structure}\n\n"
             f"Write a JSON-formatted response where the section includes:\n"
             f"- 'title': The title of the section.\n"
             f"- 'content': A detailed and well-written content for the section.\n\n"

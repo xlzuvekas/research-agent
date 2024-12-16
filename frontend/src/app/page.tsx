@@ -5,11 +5,12 @@ import Chat from "@/components/chat";
 import { useEffect, useRef, useState } from "react";
 import { GripVertical } from "lucide-react";
 import { useCoAgentStateRender } from "@copilotkit/react-core";
-import { ResearchState, Section } from "@/lib/types";
+import { ResearchState, Proposal } from "@/lib/types";
 import { Progress } from "@/components/progress";
 import SourcesModal from "@/components/resource-modal";
 import { useResearch } from "@/components/research-context";
 import { DocumentsView } from "@/components/documents-view";
+import { ProposalViewer } from "@/components/structure-proposal-viewer";
 
 const CHAT_MIN_WIDTH = 30;
 const CHAT_MAX_WIDTH = 50;
@@ -18,17 +19,64 @@ export default function HomePage() {
     const [chatWidth, setChatWidth] = useState(50) // Initial chat width in percentage
     const dividerRef = useRef<HTMLDivElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
-    const { state, setResearchState } = useResearch()
+    const { state: researchState, setResearchState, runAgent } = useResearch()
 
+    const handleProposalReviewed = async (approved: boolean, proposal: Proposal) => {
+        setResearchState((prev: ResearchState) => ({
+            ...prev,
+            proposal: {
+                ...proposal,
+                approved,
+            },
+            structure: {}
+        }))
+        runAgent()
+    }
+
+    // Handle all "logs" - The loading states that show what the agent is doing
     useCoAgentStateRender<ResearchState>({
         name: 'agent',
         render: ({ state }) => {
-            if (!state.logs || state.logs.length === 0) {
-                return null;
+        // && researchState.proposal?.approved === false
+            if (state.proposal?.approved === false) {
+                return <ProposalViewer proposal={state.proposal as never} onSubmit={handleProposalReviewed} />
             }
-            return <Progress logs={state.logs} />;
+            if (state.logs?.length > 0) {
+                return <Progress logs={state.logs} />;
+            }
+            return null;
         },
-    });
+    }, [researchState]);
+    // useCopilotAction({
+    //     name: "ReviewProposal",
+    //     description:
+    //         "Prompt the user to review structure proposal",
+    //     available: "remote",
+    //     parameters: [
+    //         {
+    //             name: "proposal",
+    //             type: "object",
+    //         },
+    //     ],
+    //     renderAndWait: ({ args, status, handler }) => {
+    //         const handleProposalReviewed = async (approved: boolean, proposal: Proposal) => {
+    //             console.log('done', {
+    //                 approved,
+    //                 proposal,
+    //             });
+    //             setResearchState((prev: ResearchState) => ({
+    //                 ...prev,
+    //                 proposal: {
+    //                     ...proposal,
+    //                     approved,
+    //                 },
+    //             }))
+    //             handler?.(approved ? 'I approve the proposal' : 'Lets look at my choices and revisit the proposal')
+    //         }
+    //
+    //         return (<ProposalViewer proposal={args.proposal as never} onSubmit={handleProposalReviewed} />);
+    //     },
+    // });
 
     useEffect(() => {
         const divider = dividerRef.current
@@ -64,7 +112,7 @@ export default function HomePage() {
     }, [])
     const {
         sections,
-    } = state
+    } = researchState
 
     const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
 
@@ -81,7 +129,7 @@ export default function HomePage() {
                         <Chat
                             onSubmitMessage={async () => {
                                 // clear the logs before starting the new research
-                                setResearchState({ ...state, logs: [] });
+                                setResearchState({ ...researchState, logs: [] });
                                 await new Promise((resolve) => setTimeout(resolve, 30));
                             }}
                         />
