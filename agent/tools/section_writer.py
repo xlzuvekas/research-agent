@@ -66,7 +66,10 @@ async def section_writer(research_query, section_title, idx, state):
         emit_intermediate_state=list(stream_states.values())
     )
 
+    structure = state.get("structure", {})
     sources = state.get("sources").values()
+
+    print('section_writer')
 
     # Define the system and user prompts
     prompt = [{
@@ -116,6 +119,12 @@ async def section_writer(research_query, section_title, idx, state):
             f"Only use footnotes when citing sources or referencing external material. "
             f"If footnotes are used, they must start from [^1] in this section. "
             f"References must be defined in the footer field, not in the content. Each reference should link to a source URL."
+            f"Structure:\n{structure}\n\n"
+            f"Write a JSON-formatted response where the section includes:\n"
+            f"- 'title': The title of the section.\n"
+            f"- 'content': A detailed and well-written content for the section.\n\n"
+            f"Your response should be in the following format:\n"
+            f"{sample_section}\n\nYour Section:"
         )
     }]
 

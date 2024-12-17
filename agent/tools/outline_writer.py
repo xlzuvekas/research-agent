@@ -35,6 +35,8 @@ async def outline_writer(research_query, state):
         sources_summary += f"\n url:  {source['url']}"
         sources_summary += f"\n content:  {source['content']}"
 
+    structure = state.get("structure", {})
+    print('outline_writer')
     prompt = [{
         "role": "system",
         "content": "You are an AI assistant that helps users write research outlines. "
@@ -44,7 +46,8 @@ async def outline_writer(research_query, state):
         "role": "user",
         "content": f"Today's date is {datetime.now().strftime('%d/%m/%Y')}\n."
                    f"Query or Topic: {research_query}\n"
-                   f"{sources_summary}\n"
+                   f"{sources_summary}\n"                   
+                   f"Desired structure: {structure}\n"
                    f"Your task is to write a critically acclaimed research outline on the "
                    f"topic above. The outline should include an introduction, body, and conclusion. "
                    f"Please return nothing but a JSON in the following format:\n"
