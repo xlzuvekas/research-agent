@@ -1,5 +1,4 @@
-
-export interface Section { title: string; content: string; idx: number; footnotes?: string; id: string }
+export interface Section { title: string; content: string; idx: number; footer?: string; id: string }
 
 export interface Source {
     content: string;
@@ -22,8 +21,6 @@ export interface ResearchState {
     intro: string;
     sections: Section[]; // Array of objects with 'title', 'content', and 'idx'
     conclusion: string;
-    // TODO: needs to be a list of footnotes maybe?
-    footnotes: string;
     sources: Sources; // Dictionary with string keys and nested dictionaries
     cited_sources: Record<keyof Sources, string[]>; // Dictionary with string keys and an array of strings
     tool: string;
@@ -31,4 +28,5 @@ export interface ResearchState {
     logs: Log[];
 }
 
-export type Document = Pick<ResearchState, 'sections' | 'title' | 'intro' | 'outline' | 'footnotes' | 'conclusion' | 'cited_sources'>
+export type Document = Pick<ResearchState, 'sections' | 'title' | 'intro' | 'outline' | 'conclusion' | 'cited_sources'>
+
