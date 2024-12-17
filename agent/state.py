@@ -3,13 +3,6 @@ from langgraph.graph import add_messages
 from typing import TypedDict, Dict, Union, List, Annotated
 from langgraph.graph import MessagesState
 
-# class Log(TypedDict):
-#     """
-#     Represents a log of an action performed by the agent.
-#     """
-#     message: str
-#     done: bool
-
 class ResearchState(MessagesState):
     title: str
     outline: dict
@@ -20,7 +13,7 @@ class ResearchState(MessagesState):
     sources: Dict[str, Dict[str, Union[str, float]]]
     cited_sources: Dict[str, List[str]]  # sources used and a list of quotes used to support the answer
     tool: str
-    logs: List[dict]
+    logs: List[dict]  # list of dicts logs to be sent to frontend with 'message', 'status'
     # messages: Annotated[list[AnyMessage], add_messages]
 
 

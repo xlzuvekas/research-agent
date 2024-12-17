@@ -1,13 +1,14 @@
 import json5 as json
 from datetime import datetime
 from typing import Optional, Dict
-
 from langchain_community.adapters.openai import convert_openai_messages
 from langchain_core.tools import tool
-from pydantic import BaseModel, Field
+from langchain_core.runnables import RunnableConfig
 from langchain_openai import ChatOpenAI
+from pydantic import BaseModel, Field
 import random
 import string
+from copilotkit.langchain import copilotkit_emit_state
 
 def generate_random_id(length=6):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
@@ -23,6 +24,14 @@ class SectionWriterInput(BaseModel):
 async def section_writer(research_query, section_title, idx, state):
     """Writes a specific section of a research report based on the query, section title, and provided sources."""
 
+    config = RunnableConfig()
+    # Log search queries
+    state["logs"] = state.get("logs", [])
+    state["logs"].append({
+        "message": f"Writing the {section_title} section...",
+        "done": False
+    })
+    await copilotkit_emit_state(config, state)
 
     sources = state.get("sources").values()
 
@@ -57,6 +66,9 @@ async def section_writer(research_query, section_title, idx, state):
     response = ChatOpenAI(model="gpt-4o-mini", max_retries=1, model_kwargs=optional_params).invoke(
         lc_messages
     ).content
+
+    state["logs"][-1]["done"] = True
+    await copilotkit_emit_state(config, state)
 
     # Parse the JSON response and update the state
     section = json.loads(response)
