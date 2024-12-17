@@ -45,3 +45,6 @@ next-env.d.ts
 frontend/node_modules/
 frontend/.env
 frontend/.next
+
+# Ignore local stepup file for langgraph dev
+agent/setup.py
