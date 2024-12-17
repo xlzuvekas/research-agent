@@ -33,29 +33,33 @@ class TavilySearchInput(BaseModel):
 async def tavily_search(sub_queries: List[TavilyQuery], state):
     """Perform searches for each sub-query using the Tavily search tool concurrently."""
     # Define a coroutine function to perform a single search with error handling
-    async def perform_search(itm):
+    async def perform_search(itm, index):
         try:
             # Add date to the query as we need the most recent results
             query_with_date = f"{itm.query} {datetime.now().strftime('%m-%Y')}"
             tavily_response = await tavily_client.search(query=query_with_date, topic=itm.topic, days=itm.days, max_results=10)
+            state["logs"][index]["done"] = True
+            await copilotkit_emit_state(config, state)
             return tavily_response['results']
         except Exception as e:
             # Handle any exceptions, log them, and return an empty list
             print(f"Error occurred during search for query '{itm.query}': {str(e)}")
+            state["logs"][index]["done"] = True
+            await copilotkit_emit_state(config, state)
             return []
 
     config = RunnableConfig()
+    state["logs"] = state.get("logs", [])
     # Log search queries
     for query in sub_queries:
-        state["logs"] = state.get("logs", [])
         state["logs"].append({
-            "message": f"Tavily search for {query.query}",
+            "message": f"Searching the web: '{query.query}'",
             "done": False
         })
     await copilotkit_emit_state(config, state)
 
     # Run all the search tasks in parallel
-    search_tasks = [perform_search(query) for query in sub_queries]
+    search_tasks = [perform_search(query, i) for i, query in enumerate(sub_queries)]
     search_responses = await asyncio.gather(*search_tasks)
 
 

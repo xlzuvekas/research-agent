@@ -7,6 +7,8 @@ from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
 
+from copilotkit.langchain import copilotkit_emit_state
+from langchain_core.runnables import RunnableConfig
 
 class OutlineWriterInput(BaseModel):
     research_query: str = Field(description="Research query")
@@ -16,6 +18,14 @@ class OutlineWriterInput(BaseModel):
 @tool("outline_writer", args_schema=OutlineWriterInput, return_direct=True)
 async def outline_writer(research_query, state):
     """writes a research outline based on the research query"""
+    config = RunnableConfig()
+    # Log search queries
+    state["logs"] = state.get("logs", [])
+    state["logs"].append({
+        "message": f"Planning report's outline...",
+        "done": False
+    })
+    await copilotkit_emit_state(config, state)
 
     # Get sources from state
     sources = state.get("sources", {})
@@ -53,6 +63,8 @@ async def outline_writer(research_query, state):
 
     # Add the outline to the state
     state["outline"] = outline
+    state["logs"][-1]["done"] = True
+    await copilotkit_emit_state(config, state)
 
     tool_msg = f"Generated the following new outline:\n{json.dumps(outline)}"
 
