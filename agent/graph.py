@@ -72,7 +72,7 @@ class MasterAgent:
                 "intro": new_state.get("intro", ""),
                 "sections": new_state.get("sections", []),
                 "conclusion": new_state.get("conclusion", ""),
-                "footnotes": new_state.get("footnotes", []),
+                "footer": new_state.get("footer", []),
                 "sources": new_state.get("sources", {}),
                 "cited_sources": new_state.get("cited_sources", {}),
                 "tool": new_state.get("tool", {}),

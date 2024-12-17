@@ -11,7 +11,7 @@ const initialState: ResearchState = {
     intro: '',
     sections: [],
     conclusion: '',
-    footnotes: '',
+    footer: '',
     sources: {},
     cited_sources: {},
     tool: '',

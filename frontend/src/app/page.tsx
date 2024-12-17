@@ -5,11 +5,12 @@ import Chat from "@/components/chat";
 import { useEffect, useRef, useState } from "react";
 import { GripVertical } from "lucide-react";
 import { useCoAgentStateRender } from "@copilotkit/react-core";
-import { ResearchState, Section } from "@/lib/types";
+import { ResearchState } from "@/lib/types";
 import { Progress } from "@/components/progress";
 import SourcesModal from "@/components/resource-modal";
 import { useResearch } from "@/components/research-context";
 import { DocumentsView } from "@/components/documents-view";
+import { useStreamingContent } from '@/lib/hooks/useStreamingContent';
 
 const CHAT_MIN_WIDTH = 30;
 const CHAT_MAX_WIDTH = 50;
@@ -29,6 +30,8 @@ export default function HomePage() {
             return <Progress logs={state.logs} />;
         },
     });
+
+    const streamingSection = useStreamingContent(state);
 
     useEffect(() => {
         const divider = dividerRef.current
@@ -97,6 +100,7 @@ export default function HomePage() {
                     {/* Document Viewer */}
                     <DocumentsView
                         sections={sections ?? []}
+                        streamingSection={streamingSection}
                         selectedSection={sections?.find(s => s.id === selectedSectionId)}
                         onSelectSection={setSelectedSectionId}
                     />

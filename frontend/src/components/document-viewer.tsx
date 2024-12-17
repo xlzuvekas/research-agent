@@ -1,6 +1,8 @@
 import type { Section as TSection } from "@/lib/types";
-import Footnotes from "@/components/footnotes";
+import Footer from "@/components/document-footer";
 import { useMemo } from "react";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface DocumentViewerProps {
     section?: TSection;
@@ -19,7 +21,7 @@ export function DocumentViewer({
     onSelect,
     placeholder,
 }: DocumentViewerProps) {
-    const { title, content, id, footnotes } = section ?? {};
+    const { title, content, id, footer } = section ?? {};
 
     const scalingStyle = useMemo(() => {
         if (compact) {
@@ -54,12 +56,12 @@ export function DocumentViewer({
             } : {})}
         >
             {placeholder ? (<h1 className="text-xl font-noto text-center py-5 px-10">{placeholder}</h1>) : (
-                <div id={`${id}`}>
-                    <h4>{title}</h4>
-                    <p>{content}</p>
+                <div id={`${id}`} className={compact ? 'max-h-full overflow-hidden relative' : ''}>
+                    <h4 className={compact ? 'text-[10px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center' : "text-2xl font-semibold mb-4 w-full text-center"}>{title}</h4>
+                    <div className={compact ? 'text-black/20' : ''}><Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown></div>
+                    {!compact && footer?.length && (<Footer footer={footer ?? ''}/>)}
                 </div>
             )}
-            {!compact && !placeholder && <Footnotes footnotes={footnotes ?? ''}/>}
         </div>
     )
 }

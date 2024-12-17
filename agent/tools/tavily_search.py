@@ -66,11 +66,15 @@ async def tavily_search(sub_queries: List[TavilyQuery], state):
     # Combine the results from all the responses
     tool_msg = "In search, found the following new documents:\n"
     sources = state.get('sources', {})
-    for response in search_responses:
+    for i, response in enumerate(search_responses):
         for source in response:
             if not sources or source['url'] not in sources:
                 sources[source['url']] = source
                 tool_msg += json.dumps(source)
+
+        state["logs"][i]["done"] = True
+        await copilotkit_emit_state(config, state)
+
     state['sources'] = sources
 
     return state, tool_msg
