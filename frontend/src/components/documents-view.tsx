@@ -12,24 +12,8 @@ interface DocumentsViewProps {
 }
 
 export function DocumentsView({ sections, selectedSection, onSelectSection, streamingSection }: DocumentsViewProps) {
-    const [currentPage, setCurrentPage] = useState(0);
     const [zoomLevel, setZoomLevel] = useState(100);
     const [viewableSection, setViewableSection] = useState(selectedSection)
-    const sectionsPerPage = 2;
-
-    const totalPages = Math.ceil((sections.length || 0) / sectionsPerPage);
-
-    const handleNextPage = () => {
-        if (currentPage < totalPages - 1) {
-            setCurrentPage(currentPage + 1);
-        }
-    };
-
-    const handlePrevPage = () => {
-        if (currentPage > 0) {
-            setCurrentPage(currentPage - 1);
-        }
-    };
 
     const handleZoomChange = (value: string | number) => {
         setZoomLevel(Number(value));
@@ -64,32 +48,6 @@ export function DocumentsView({ sections, selectedSection, onSelectSection, stre
 
                 {/* Scrollable thumbnails on the right */}
                 <DocumentsScrollbar sections={sections} selectedSectionId={selectedSection?.id} onSelectSection={onSelectSection} />
-            </div>
-
-            <div className="flex items-center justify-between mt-4 px-4">
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={handlePrevPage}
-                        disabled={currentPage === 0 || totalPages <= 1}
-                        className="px-3 py-1 bg-gray-100 rounded disabled:opacity-50"
-                    >
-                        Previous
-                    </button>
-                    <button
-                        onClick={handleNextPage}
-                        disabled={currentPage === totalPages - 1 || totalPages <= 1}
-                        className="px-3 py-1 bg-gray-100 rounded disabled:opacity-50"
-                    >
-                        Next
-                    </button>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <span>Page {currentPage + 1} of {totalPages}</span>
-                    <span>•</span>
-                    <span>{Math.min((currentPage + 1) * sectionsPerPage, sections.length || 0)} of {sections.length || 0} sections</span>
-                    <span>•</span>
-                    <span>{zoomLevel}%</span>
-                </div>
             </div>
         </div>
     )
