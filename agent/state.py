@@ -5,15 +5,15 @@ from langgraph.graph import MessagesState
 
 class ResearchState(MessagesState):
     title: str
-    proposal: Dict[str, List[str]]  # Stores proposed structure before user approval
-    structure: Dict[str, List[str]]  # Finalized structure chosen by the user
+    proposal: Dict[str, Union[str, bool, Dict[str, Union[str, bool]]]]  # Stores proposed structure before user approval
+    # structure: Dict[str, List[str]]  # Finalized structure chosen by the user
     outline: dict
-    intro: str
+    # intro: str
     sections: List[dict]  # list of dicts with 'title','content',and 'idx'
-    conclusion: str
+    # conclusion: str
     footnotes: str
     sources: Dict[str, Dict[str, Union[str, float]]]
-    cited_sources: Dict[str, List[str]]  # sources used and a list of quotes used to support the answer
+    # cited_sources: Dict[str, List[str]]  # sources used and a list of quotes used to support the answer
     tool: str
     logs: List[dict]  # list of dicts logs to be sent to frontend with 'message', 'status'
     # messages: Annotated[list[AnyMessage], add_messages]

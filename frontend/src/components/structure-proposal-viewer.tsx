@@ -88,8 +88,8 @@ export function ProposalViewer({
                 <ScrollArea className="h-[60vh] pr-4">
                     <div className="space-y-6">
                         {ProposalItem({ title: 'Sections', proposalItemKey: ProposalSectionName.Sections, proposal: reviewedProposal, renderSection })}
-                        {ProposalItem({ title: 'Key Points', proposalItemKey: ProposalSectionName.KeyPoints, proposal: reviewedProposal, renderSection })}
-                        {ProposalItem({ title: 'Document Features', proposalItemKey: ProposalSectionName.DocumentFeatures, proposal: reviewedProposal, renderSection })}
+                        {/*{ProposalItem({ title: 'Key Points', proposalItemKey: ProposalSectionName.KeyPoints, proposal: reviewedProposal, renderSection })}*/}
+                        {/*{ProposalItem({ title: 'Document Features', proposalItemKey: ProposalSectionName.DocumentFeatures, proposal: reviewedProposal, renderSection })}*/}
                     </div>
                 </ScrollArea>
             </CardContent>

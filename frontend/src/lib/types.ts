@@ -24,16 +24,16 @@ export interface ProposalSection {
 
 export enum ProposalSectionName {
     Sections = "sections",
-    KeyPoints = "key_points",
-    DocumentFeatures = "document_features"
+    // KeyPoints = "key_points",
+    // DocumentFeatures = "document_features"
 }
 
 export type IProposalItem = Record<ProposalSectionName, ProposalSection> & { description: string }
 
 export interface Proposal {
     [ProposalSectionName.Sections]: IProposalItem
-    [ProposalSectionName.KeyPoints]: IProposalItem
-    [ProposalSectionName.DocumentFeatures]: IProposalItem
+    // [ProposalSectionName.KeyPoints]: IProposalItem
+    // [ProposalSectionName.DocumentFeatures]: IProposalItem
     timestamp: string
     approved: boolean
 }
@@ -43,16 +43,16 @@ export interface ResearchState {
     title: string;
     outline: Record<string, unknown>;
     proposal: Proposal;
-    structure: Record<string, unknown>;
-    intro: string;
+    // structure: Record<string, unknown>;
+    // intro: string;
     sections: Section[]; // Array of objects with 'title', 'content', and 'idx'
-    conclusion: string;
+    // conclusion: string;
     sources: Sources; // Dictionary with string keys and nested dictionaries
-    cited_sources: Record<keyof Sources, string[]>; // Dictionary with string keys and an array of strings
+    // cited_sources: Record<keyof Sources, string[]>; // Dictionary with string keys and an array of strings
     tool: string;
     messages: { [key: string]: unknown }[]; // Array of AnyMessage objects with potential additional properties
     logs: Log[];
 }
 
-export type Document = Pick<ResearchState, 'sections' | 'title' | 'intro' | 'outline' | 'conclusion' | 'cited_sources'>
+// export type Document = Pick<ResearchState, 'sections' | 'title' | 'intro' | 'outline' | 'conclusion' | 'cited_sources'>
 
