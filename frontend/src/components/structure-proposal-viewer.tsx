@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Proposal, ProposalSection, ProposalSectionName } from "@/lib/types";
+import { useResearch } from "@/components/research-context";
 
 function ProposalItem({
     proposalItemKey,
@@ -32,12 +33,12 @@ function ProposalItem({
 }
 
 export function ProposalViewer({
-    proposal,
     onSubmit,
 }: {
-    proposal: Proposal;
     onSubmit: (approved: boolean, proposal: Proposal) => void,
 }) {
+    const { state, setResearchState } = useResearch()
+    const proposal = state.proposal
     const [reviewedProposal, setReviewedProposal] = useState(proposal)
 
     const handleCheckboxChange = (
@@ -52,6 +53,14 @@ export function ProposalViewer({
             return newStructure
         })
     }
+
+    const handleSubmit = useCallback((approved: boolean) => {
+        setResearchState(prev => ({
+            ...prev,
+            proposal: reviewedProposal,
+        }))
+        onSubmit(approved, reviewedProposal)
+    }, [onSubmit, reviewedProposal, setResearchState])
 
     const renderSection = (
         sectionType: ProposalSectionName,
@@ -88,14 +97,12 @@ export function ProposalViewer({
                 <ScrollArea className="h-[60vh] pr-4">
                     <div className="space-y-6">
                         {ProposalItem({ title: 'Sections', proposalItemKey: ProposalSectionName.Sections, proposal: reviewedProposal, renderSection })}
-                        {/*{ProposalItem({ title: 'Key Points', proposalItemKey: ProposalSectionName.KeyPoints, proposal: reviewedProposal, renderSection })}*/}
-                        {/*{ProposalItem({ title: 'Document Features', proposalItemKey: ProposalSectionName.DocumentFeatures, proposal: reviewedProposal, renderSection })}*/}
                     </div>
                 </ScrollArea>
             </CardContent>
             <CardFooter className="flex justify-between">
-                <Button variant="outline" onClick={() => onSubmit(false, reviewedProposal)}>Reject Proposal</Button>
-                <Button onClick={() => onSubmit(true, reviewedProposal)}>Approve Proposal</Button>
+                <Button variant="outline" onClick={() => handleSubmit(false)}>Reject Proposal</Button>
+                <Button onClick={() => handleSubmit(true)}>Approve Proposal</Button>
             </CardFooter>
         </Card>
     )

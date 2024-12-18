@@ -36,6 +36,7 @@ class MasterAgent:
         # workflow.add_node("planner", structure_planner)
         workflow.add_node("agent", self.call_model)
         workflow.add_node("tools", self.tool_node)
+        workflow.add_node("human", self.ask_human)
 
         # Set the entrypoint as route_query
         workflow.set_entry_point("agent")
@@ -46,16 +47,18 @@ class MasterAgent:
             self.should_continue,
             {
                 "tools": "tools",
+                "human": "human",
                 "end": END,
             }
 
         )
 
         workflow.add_edge("tools", "agent")
+        workflow.add_edge("human", "agent")
         workflow.add_edge("agent", END)
 
         # Compile the graph and save it interrupt_after=["planner"]
-        self.graph = workflow.compile()
+        self.graph = workflow.compile(interrupt_after=['human'])
 
     # Define an async custom research tool node that access and updates the research state
     async def tool_node(self, state: ResearchState, config: RunnableConfig):
@@ -67,10 +70,6 @@ class MasterAgent:
             tool_call["args"]["state"] = state  # update the state so the tool could access the state
             tool_call["args"]["state"].pop("messages",
                                            None)  # don't call tool with msgs field as it caused serialization error
-            # TODO: make this nicer
-            if tool_call["name"] == 'review_proposal':
-                print(tool_call)
-                break
 
             new_state, tool_msg = await tool.ainvoke(tool_call["args"])
             tool_call["args"]["state"] = None
@@ -96,6 +95,14 @@ class MasterAgent:
 
     # We define a fake node to ask the human
     def ask_human(self, state: ResearchState):
+        print('********')
+        print('********')
+        print('here')
+        print('********')
+        print('********')
+        messages = state['messages']
+        last_message = messages[-1]
+        print(last_message)
         pass
 
     # Invoke a model with research tools to gather data about the company
@@ -104,6 +111,7 @@ class MasterAgent:
 
         # Check and cast the last message if needed
         last_message = state['messages'][-1]
+        print(last_message)
         allowed_types = (AIMessage, SystemMessage, HumanMessage, ToolMessage)
 
         if not isinstance(last_message, allowed_types):
@@ -119,7 +127,7 @@ class MasterAgent:
             "2. Use the extract tool to extract additional content from relevant URLs.\n"
             "3. Use the outline tool to analyze the gathered information and organize it into a clear, logical **outline proposal**. Break the content into meaningful sections that will guide the report structure. Wait for outline approval before continuing to the next phase.\n"
             "4. Use the section writer tool to compose each section of the report based on the **approved outline**. Ensure the report is well-written, properly sourced, and easy to understand. Avoid responding with the text of the report directly—always use the SectionWrite tool for the final product.\n\n"
-            "5. After using the outline tool, YOU MUST use review_proposal tool.\n"
+            "5. After using the outline tool, YOU MUST use review_proposal tool. and pass the proposal as argument \n"
             "After using the outline and section writer research tools, actively engage with the user to discuss next steps. **Do not summarize your completed work**, as the user has full access to the research progress.\n\n"
             "Instead of sharing details like generated outlines or reports, simply confirm the task is ready and ask for feedback or next steps. For example:\n"
             "'I have completed [..MAX additional 5 words]. Would you like me to revisit any part or move forward?'\n\n"
@@ -129,10 +137,20 @@ class MasterAgent:
         proposal = state.get("proposal", {})
         # Extract sections with "approved": True
         if proposal:
+            # TODO: Should we add this?
+            # if proposal["approved"] == True:
+            #     config = copilotkit_customize_config(
+            #         config,
+            #         emit_messages=True,  # make sure to enable emitting messages to the frontend
+            #     )
+            #     await copilotkit_exit(config)
+
+            print('proposal:')
             print(proposal)
             outline = {k: {'title': v['title'], 'description': v['description']} for k, v in
                        proposal['sections'].items()
                        if isinstance(v, dict) and v.get('approved')}
+            print('outline: ')
             print(outline)
             if outline:
                 prompt += (
@@ -185,6 +203,9 @@ class MasterAgent:
         if isinstance(last_message, AIMessage):
             # If the LLM makes a regular tool call, route to the "tools" node
             if last_message.tool_calls:
+                for tool_call in last_message.tool_calls:
+                    if tool_call['name'] == 'review_proposal':
+                        return "human"
                 return "tools"
 
         # If no conditions are met or if it's not an AIMessage, return "end" to stop

@@ -24,16 +24,12 @@ export interface ProposalSection {
 
 export enum ProposalSectionName {
     Sections = "sections",
-    // KeyPoints = "key_points",
-    // DocumentFeatures = "document_features"
 }
 
 export type IProposalItem = Record<ProposalSectionName, ProposalSection> & { description: string }
 
 export interface Proposal {
     [ProposalSectionName.Sections]: IProposalItem
-    // [ProposalSectionName.KeyPoints]: IProposalItem
-    // [ProposalSectionName.DocumentFeatures]: IProposalItem
     timestamp: string
     approved: boolean
 }

@@ -40,19 +40,16 @@ export default function HomePage() {
         description:
             "Prompt the user to review structure proposal. Right after proposal generation",
         available: "remote",
-        parameters: [
-            {
-                name: "proposal",
-                type: "object",
-            },
-        ],
-        renderAndWaitForResponse: ({ args, handler }) => (
+        parameters: [],
+        renderAndWaitForResponse: ({ handler }) => (
             <ProposalViewer
-                proposal={args.proposal as never}
-                onSubmit={(approved, proposal) => handler?.({
-                            ...proposal,
-                            approved,
-                        })}
+                onSubmit={(approved, proposal) => {
+                    setResearchState(prev => ({
+                        ...prev,
+                        proposal,
+                    }))
+                    handler?.(approved ? 'I approve the proposal' : 'Lets revisit')
+                }}
             />
         ),
     });
