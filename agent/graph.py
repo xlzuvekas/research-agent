@@ -109,16 +109,14 @@ class MasterAgent:
         pass
 
     async def human_response(self, state: ResearchState, config: RunnableConfig):
-        print("IN HUNAN RESPONSE")
         config = copilotkit_customize_config(
             config,
             emit_messages=True,  # make sure to enable emitting messages to the frontend
         )
         await copilotkit_exit(config)
-        await copilotkit_emit_message(config, "✅ Got answer")
         last_message = cast(ToolMessage, state["messages"][-1])
-        print("in human: ",last_message)
-        print("ALL msgs:\n\n{}".format(state["messages"]))
+        content = json.loads(last_message.content)
+        state["proposal"] = content
         return state
 
     # Invoke a model with research tools to gather data about the company
@@ -148,6 +146,7 @@ class MasterAgent:
             "After using the outline and section writer research tools, actively engage with the user to discuss next steps. **Do not summarize your completed work**, as the user has full access to the research progress.\n\n"
             "Instead of sharing details like generated outlines or reports, simply confirm the task is ready and ask for feedback or next steps. For example:\n"
             "'I have completed [..MAX additional 5 words]. Would you like me to revisit any part or move forward?'\n\n"
+            "When you have a proposal, you must only write the sections that are approved. If a section is not approved, you must not write it."
             "Your role is to provide support, maintain clear communication, and ensure the final report aligns with the user's expectations."
         )
 
