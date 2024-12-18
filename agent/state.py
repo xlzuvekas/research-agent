@@ -2,8 +2,9 @@ from langchain_core.messages import AnyMessage
 from langgraph.graph import add_messages
 from typing import TypedDict, Dict, Union, List, Annotated
 from langgraph.graph import MessagesState
+from copilotkit import CopilotKitState # extends MessagesState
 
-class ResearchState(MessagesState):
+class ResearchState(CopilotKitState):
     title: str
     proposal: Dict[str, Union[str, bool, Dict[str, Union[str, bool]]]]  # Stores proposed structure before user approval
     # structure: Dict[str, List[str]]  # Finalized structure chosen by the user

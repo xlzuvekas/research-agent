@@ -7,7 +7,7 @@ from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
 
-from copilotkit.langchain import copilotkit_emit_state
+from copilotkit.langchain import copilotkit_emit_state, copilotkit_customize_config, copilotkit_emit_message
 from langchain_core.runnables import RunnableConfig
 
 # Define proposal structure keys at module level for single source of truth
@@ -21,35 +21,29 @@ PROPOSAL_FORMAT = {
             # Defines if this goes in the final structure. Set only important parts to True by default
         }
     },
-    # "key_points": {
-    #     "description": "...",  # This is a description on what are "key points"
-    #     "point1": { # Key is the name of the item
-    #         "title": "Title of the item",
-    #         "description": "Description of key point1",
-    #         "approved": False, # Defines if this goes in the final structure. Set only important parts to True by default
-    #     }
-    # },
-    # "document_features": { # Features are technical, structural things for the research: should we have footnotes? Should we have citations?
-    #     "description": "...",  # This is a description on what are "features". Things like "footnotes", "citations" etc.
-    #     "feature1": { # Key is the name of the item
-    #         "title": "Title of the item",
-    #         "description": "Description of key point1",
-    #         "approved": False, # Defines if this goes in the final structure. Set only important parts to True by default
-    #     }
-    # },
 }
 
 PROPOSAL_KEYS = list(PROPOSAL_FORMAT.keys())
 
+# class Section:
+#     title: str = Field(description="Title of the section")
+#     description: str = Field(description="Description of the section")
+#     approved: bool
+#
+# class Proposal:
+#     sections: Dict[Section]
 
 class OutlineWriterInput(BaseModel):
     research_query: str = Field(description="Research query")
     state: Optional[Dict] = Field(description="State of the research")
 
+@tool
+def WriteProposal(args_schema=OutlineWriterInput, return_direct=True):
+    """Writes a research outline proposal"""
 
 @tool("outline_writer", args_schema=OutlineWriterInput, return_direct=True)
 async def outline_writer(research_query, state):
-    """writes a research outline based on the research query"""
+    """Writes a research outline proposal based on the research query"""
     # Get sources from state
     sources = state.get("sources", {})
     sources_summary = ""
@@ -90,6 +84,7 @@ async def outline_writer(research_query, state):
     }
 
     config = RunnableConfig()
+    config = copilotkit_customize_config(config, emit_tool_calls=True, emit_messages=False)
     state["logs"] = state.get("logs", [])
     state["logs"].append({
         "message": "Thinking of a research proposal",
@@ -104,8 +99,10 @@ async def outline_writer(research_query, state):
     state["logs"][-2]["done"] = True
     await copilotkit_emit_state(config, state)
 
-    response = ChatOpenAI(model='gpt-4o-mini', max_retries=1, model_kwargs=optional_params).invoke(lc_messages,
-                                                                                                   config).content
+    response = ChatOpenAI(model='gpt-4o-mini', max_retries=1, model_kwargs=optional_params).bind_tools(
+        state["copilotkit"]["actions"], # bind the copilotkit actions to the model as tools
+        tool_choice="WriteProposal"
+    ).invoke(lc_messages, config).content
 
     for i, log in enumerate(state["logs"]):
         state["logs"][i]["done"] = True
