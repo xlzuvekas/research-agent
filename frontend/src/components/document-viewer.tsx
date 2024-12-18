@@ -1,8 +1,9 @@
 import type { Section as TSection } from "@/lib/types";
 import Footer from "@/components/document-footer";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { DocumentEditor, DocumentEditorProps } from "@/components/documents-editor";
 
 interface DocumentViewerProps {
     section?: TSection;
@@ -11,6 +12,8 @@ interface DocumentViewerProps {
     highlight?: boolean;
     onSelect?: (sectionId: string) => void;
     placeholder?: string;
+    onSectionEdit: DocumentEditorProps['onSectionEdit']
+    editMode: boolean
 }
 
 export function DocumentViewer({
@@ -20,6 +23,8 @@ export function DocumentViewer({
     highlight = false,
     onSelect,
     placeholder,
+    onSectionEdit,
+    editMode,
 }: DocumentViewerProps) {
     const { title, content, id, footer } = section ?? {};
 
@@ -42,6 +47,16 @@ export function DocumentViewer({
         }
     }, [compact, zoomLevel])
 
+        if (editMode) {
+        return (
+            <DocumentEditor
+                section={section!}
+                zoomLevel={zoomLevel}
+                onSectionEdit={onSectionEdit}
+            />
+        )
+    }
+
     return (
         <div
             key={id}
@@ -59,7 +74,7 @@ export function DocumentViewer({
                 <div id={`${id}`} className={compact ? 'max-h-full overflow-hidden relative' : ''}>
                     <h4 className={compact ? 'text-[10px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center' : "text-2xl font-semibold mb-4 w-full text-center"}>{title}</h4>
                     <div className={compact ? 'text-black/20' : ''}><Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown></div>
-                    {!compact && footer?.length && (<Footer footer={footer ?? ''}/>)}
+                    {!compact && footer?.length ? <Footer footer={footer ?? ''}/> : null}
                 </div>
             )}
         </div>
