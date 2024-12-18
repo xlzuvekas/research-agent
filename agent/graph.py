@@ -170,7 +170,7 @@ class MasterAgent:
         print("prompt: ", prompt)
 
         model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-        config = copilotkit_customize_config(config, emit_tool_calls=True)
+        config = copilotkit_customize_config(config, emit_tool_calls=['review_proposal'])
         ainvoke_kwargs = {}
         ainvoke_kwargs["parallel_tool_calls"] = False
         # print('*****TOOL*****')
