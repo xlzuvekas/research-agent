@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from tavily import AsyncTavilyClient
 from typing import TypedDict, List, Annotated, Literal, Dict, Union, Optional
 from langchain_core.runnables import RunnableConfig
+from pdb import set_trace as bp
 
 load_dotenv('.env')
 tavily_client = AsyncTavilyClient()
@@ -74,6 +75,11 @@ async def tavily_search(sub_queries: List[TavilyQuery], state):
 
         state["logs"][i]["done"] = True
         await copilotkit_emit_state(config, state)
+
+    for key,val in sources.items():
+        if not sources[key].get('title',None):
+            sources[key]['title'] = 'No Title, Invalid Link'
+
 
     state['sources'] = sources
 
