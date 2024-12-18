@@ -36,7 +36,7 @@ export function ProposalViewer({
     onSubmit,
 }: {
     proposal: Proposal;
-    onSubmit: (approved: boolean, proposal: Proposal) => Promise<void>,
+    onSubmit: (approved: boolean, proposal: Proposal) => void,
 }) {
     const [reviewedProposal, setReviewedProposal] = useState(proposal)
 
