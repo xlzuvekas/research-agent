@@ -11,7 +11,7 @@ from langgraph.graph import StateGraph, START, END, add_messages
 from langchain_core.runnables import RunnableConfig
 from langgraph.types import Command
 
-from copilotkit.langchain import copilotkit_emit_state, copilotkit_customize_config
+from copilotkit.langchain import copilotkit_emit_state, copilotkit_customize_config, copilotkit_exit
 
 from state import ResearchState
 from tools.tavily_search import tavily_search
@@ -37,6 +37,7 @@ class MasterAgent:
         workflow.add_node("agent", self.call_model)
         workflow.add_node("tools", self.tool_node)
         workflow.add_node("human", self.ask_human)
+        workflow.add_node("human_response", self.human_response)
 
         # Set the entrypoint as route_query
         workflow.set_entry_point("agent")
@@ -54,7 +55,7 @@ class MasterAgent:
         )
 
         workflow.add_edge("tools", "agent")
-        workflow.add_edge("human", "agent")
+        workflow.add_edge("human", "human_response")
         workflow.add_edge("agent", END)
 
         # Compile the graph and save it interrupt_after=["planner"]
@@ -105,12 +106,24 @@ class MasterAgent:
         print(last_message)
         pass
 
+    async def human_response(self, state: ResearchState, config: RunnableConfig):
+        config = copilotkit_customize_config(
+            config,
+            emit_messages=True,  # make sure to enable emitting messages to the frontend
+        )
+        await copilotkit_exit(config)
+        return Command(
+            goto='agent',
+            update=state
+        )
+
     # Invoke a model with research tools to gather data about the company
     async def call_model(self, state: ResearchState, config: RunnableConfig):
         print("call_model")
 
         # Check and cast the last message if needed
         last_message = state['messages'][-1]
+        print('last_message:')
         print(last_message)
         allowed_types = (AIMessage, SystemMessage, HumanMessage, ToolMessage)
 
@@ -139,11 +152,7 @@ class MasterAgent:
         if proposal:
             # TODO: Should we add this?
             # if proposal["approved"] == True:
-            #     config = copilotkit_customize_config(
-            #         config,
-            #         emit_messages=True,  # make sure to enable emitting messages to the frontend
-            #     )
-            #     await copilotkit_exit(config)
+
 
             print('proposal:')
             print(proposal)

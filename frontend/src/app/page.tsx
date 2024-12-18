@@ -43,13 +43,10 @@ export default function HomePage() {
         parameters: [],
         renderAndWaitForResponse: ({ handler }) => (
             <ProposalViewer
-                onSubmit={(approved, proposal) => {
-                    setResearchState(prev => ({
-                        ...prev,
-                        proposal,
-                    }))
-                    handler?.(approved ? 'I approve the proposal' : 'Lets revisit')
-                }}
+                onSubmit={(approved, proposal) => handler?.({
+                            ...proposal,
+                            approved,
+                        })}
             />
         ),
     });
