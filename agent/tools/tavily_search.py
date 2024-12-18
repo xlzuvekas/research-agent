@@ -8,7 +8,6 @@ from pydantic import BaseModel, Field
 from tavily import AsyncTavilyClient
 from typing import TypedDict, List, Annotated, Literal, Dict, Union, Optional
 from langchain_core.runnables import RunnableConfig
-from pdb import set_trace as bp
 
 load_dotenv('.env')
 tavily_client = AsyncTavilyClient()
