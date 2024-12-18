@@ -1,5 +1,5 @@
 import { Section } from "@/lib/types";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import DocumentOptions from "@/components/document-options";
 import { DocumentsScrollbar } from "@/components/documents-scrollbar";
 import { DocumentViewer } from "@/components/document-viewer";
@@ -14,16 +14,16 @@ interface DocumentsViewProps {
 }
 
 export function DocumentsView({ sections, selectedSection, onSelectSection, streamingSection }: DocumentsViewProps) {
-    const { state, setResearchState } = useResearch()
+    const { state, setResearchState, running } = useResearch()
     const [viewableSection, setViewableSection] = useState(selectedSection)
     const [documentOptionsState, setDocumentOptionsState] = useState<DocumentOptionsState>({ mode: 'full', editMode: false, zoom: 100 })
 
-    const handleSectionEdit = (editedSection: Section) => {
+    const handleSectionEdit = useCallback((editedSection: Section) => {
         setResearchState({
             ...state,
             sections: state.sections.map(section => section.id === editedSection.id ? editedSection : section)
         })
-    }
+    }, [setResearchState, state])
 
     useEffect(() => {
         if (selectedSection) {
@@ -36,21 +36,30 @@ export function DocumentsView({ sections, selectedSection, onSelectSection, stre
         }
     }, [streamingSection, selectedSection]);
 
-    const emptyState = (
-        <DocumentViewer
-            editMode={false}
-            onSectionEdit={handleSectionEdit}
-            zoomLevel={documentOptionsState.zoom}
-            placeholder={sections.length ? "Pick a section from the sections tab to the right, to view and edit" : 'Start by asking a research question in the chat'}
-        />
-    )
+    const emptyState = useMemo(() => {
+        let placeholder = 'Start by asking a research question in the chat'
+        if (running && !sections.length) {
+            placeholder = 'The agent is running. Once a research was created, it will show up here'
+        }
+        if (sections.length) {
+            placeholder = 'Pick a section from the sections tab to the right, to view and edit'
+        }
+        return (
+            <DocumentViewer
+                editMode={false}
+                onSectionEdit={handleSectionEdit}
+                zoomLevel={documentOptionsState.zoom}
+                placeholder={placeholder}
+            />
+        )
+    }, [sections.length, running, documentOptionsState.zoom, handleSectionEdit])
 
     return (
         <div className="flex flex-col flex-1 overflow-y-hidden h-full p-4">
             <DocumentOptions
                 onChange={change => setDocumentOptionsState(prev => ({ ...prev, ...change }))}
                 state={documentOptionsState}
-                canEdit={!!viewableSection || documentOptionsState.mode === 'full'}
+                canEdit={Boolean(!running && sections.length && (viewableSection || documentOptionsState.mode === 'full'))}
             />
 
             {documentOptionsState.mode === 'section' ? (
@@ -67,11 +76,13 @@ export function DocumentsView({ sections, selectedSection, onSelectSection, stre
                     ) : emptyState}
 
                     {/* Scrollable thumbnails on the right */}
-                    <DocumentsScrollbar
-                        sections={sections}
-                        selectedSectionId={selectedSection?.id}
-                        onSelectSection={onSelectSection}
-                    />
+                    {sections.length > 0 && (
+                        <DocumentsScrollbar
+                            sections={sections}
+                            selectedSectionId={selectedSection?.id}
+                            onSelectSection={onSelectSection}
+                        />
+                    )}
                 </div>
             ) : (
                 sections.length ? (
