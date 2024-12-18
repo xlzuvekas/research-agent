@@ -67,6 +67,11 @@ class MasterAgent:
             tool_call["args"]["state"] = state  # update the state so the tool could access the state
             tool_call["args"]["state"].pop("messages",
                                            None)  # don't call tool with msgs field as it caused serialization error
+            # TODO: make this nicer
+            if tool_call["name"] == 'review_proposal':
+                print(tool_call)
+                break
+
             new_state, tool_msg = await tool.ainvoke(tool_call["args"])
             tool_call["args"]["state"] = None
             msgs.append(ToolMessage(content=tool_msg, name=tool_call["name"], tool_call_id=tool_call["id"]))
@@ -114,6 +119,7 @@ class MasterAgent:
             "2. Use the extract tool to extract additional content from relevant URLs.\n"
             "3. Use the outline tool to analyze the gathered information and organize it into a clear, logical **outline proposal**. Break the content into meaningful sections that will guide the report structure. Wait for outline approval before continuing to the next phase.\n"
             "4. Use the section writer tool to compose each section of the report based on the **approved outline**. Ensure the report is well-written, properly sourced, and easy to understand. Avoid responding with the text of the report directly—always use the SectionWrite tool for the final product.\n\n"
+            "5. After using the outline tool, YOU MUST use review_proposal tool.\n"
             "After using the outline and section writer research tools, actively engage with the user to discuss next steps. **Do not summarize your completed work**, as the user has full access to the research progress.\n\n"
             "Instead of sharing details like generated outlines or reports, simply confirm the task is ready and ask for feedback or next steps. For example:\n"
             "'I have completed [..MAX additional 5 words]. Would you like me to revisit any part or move forward?'\n\n"
@@ -141,7 +147,12 @@ class MasterAgent:
         config = copilotkit_customize_config(config, emit_tool_calls=True)
         ainvoke_kwargs = {}
         ainvoke_kwargs["parallel_tool_calls"] = False
-        # print(state["copilotkit"]["actions"])
+        print('*****TOOL*****')
+        print(state["copilotkit"]["actions"])
+        print('**********')
+        for tool in state["copilotkit"]["actions"]:
+            self.tools_by_name[tool["name"]] = tool
+
         response = await model.bind_tools(self.tools + state["copilotkit"]["actions"],
                                           **ainvoke_kwargs).ainvoke([
             SystemMessage(
@@ -180,21 +191,21 @@ class MasterAgent:
         return "end"
 
     # Define an async function to run your graph code
-    async def run_graph(self):
-        graph = self.graph
-        messages = [
-            HumanMessage(content="Please run research on Tavily company")
-        ]
-        async for s in graph.astream({"messages": messages}, stream_mode="values"):
-            message = s["messages"][-1]
-            if isinstance(message, tuple):
-                print(message)
-            else:
-                message.pretty_print()
+    # async def run_graph(self):
+    #     graph = self.graph
+    #     messages = [
+    #         HumanMessage(content="Please run research on Tavily company")
+    #     ]
+    #     async for s in graph.astream({"messages": messages}, stream_mode="values"):
+    #         message = s["messages"][-1]
+    #         if isinstance(message, tuple):
+    #             print(message)
+    #         else:
+    #             message.pretty_print()
 
 
 # Run the async function
-asyncio.run(MasterAgent().run_graph())
+# asyncio.run(MasterAgent().run_graph())
 
 graph = MasterAgent().graph
 
