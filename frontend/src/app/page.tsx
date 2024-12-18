@@ -36,9 +36,9 @@ export default function HomePage() {
     }, [researchState]);
 
     useCopilotAction({
-        name: "ReviewProposal",
+        name: "review_proposal",
         description:
-            "Prompt the user to review structure proposal. Right after generating outline",
+            "Prompt the user to review structure proposal. Right after proposal generation",
         available: "remote",
         parameters: [
             {

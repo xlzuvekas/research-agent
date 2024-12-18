@@ -37,10 +37,6 @@ class OutlineWriterInput(BaseModel):
     research_query: str = Field(description="Research query")
     state: Optional[Dict] = Field(description="State of the research")
 
-@tool
-def WriteProposal(args_schema=OutlineWriterInput, return_direct=True):
-    """Writes a research outline proposal"""
-
 @tool("outline_writer", args_schema=OutlineWriterInput, return_direct=True)
 async def outline_writer(research_query, state):
     """Writes a research outline proposal based on the research query"""
@@ -84,7 +80,6 @@ async def outline_writer(research_query, state):
     }
 
     config = RunnableConfig()
-    config = copilotkit_customize_config(config, emit_tool_calls=True, emit_messages=False)
     state["logs"] = state.get("logs", [])
     state["logs"].append({
         "message": "Thinking of a research proposal",
@@ -99,10 +94,7 @@ async def outline_writer(research_query, state):
     state["logs"][-2]["done"] = True
     await copilotkit_emit_state(config, state)
 
-    response = ChatOpenAI(model='gpt-4o-mini', max_retries=1, model_kwargs=optional_params).bind_tools(
-        state["copilotkit"]["actions"], # bind the copilotkit actions to the model as tools
-        tool_choice="WriteProposal"
-    ).invoke(lc_messages, config).content
+    response = ChatOpenAI(model='gpt-4o-mini', max_retries=1, model_kwargs=optional_params).invoke(lc_messages, config).content
 
     for i, log in enumerate(state["logs"]):
         state["logs"][i]["done"] = True
