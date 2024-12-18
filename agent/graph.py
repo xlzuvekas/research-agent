@@ -117,6 +117,7 @@ class MasterAgent:
         await copilotkit_exit(config)
         await copilotkit_emit_message(config, "✅ Got answer")
         last_message = cast(ToolMessage, state["messages"][-1])
+        print("in human: ",last_message)
         print("ALL msgs:\n\n{}".format(state["messages"]))
         return state
 

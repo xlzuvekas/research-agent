@@ -39,6 +39,7 @@ export function ProposalViewer({
 }) {
     const { state, setResearchState } = useResearch()
     const proposal = state.proposal
+    console.log("state: ", proposal)
     const [reviewedProposal, setReviewedProposal] = useState(proposal)
 
     const handleCheckboxChange = (
@@ -50,15 +51,18 @@ export function ProposalViewer({
             const newStructure = {...prev}
             // @ts-expect-error -- ignore
             newStructure[sectionType][sectionKey].approved = checked
+            console.log("Updated proposal:", newStructure); // Log the new state after update
             return newStructure
         })
     }
 
     const handleSubmit = useCallback((approved: boolean) => {
-        setResearchState(prev => ({
-            ...prev,
-            proposal: reviewedProposal,
-        }))
+        console.log("handleSubmit called with approved:", approved); // Log to verify function call
+        // setResearchState(prev => ({
+        //     ...prev,
+        //     proposal: reviewedProposal,
+        // }))
+        console.log("Submitting proposal with state:", reviewedProposal); // Log the new state
         onSubmit(approved, reviewedProposal)
     }, [onSubmit, reviewedProposal, setResearchState])
 
@@ -101,6 +105,8 @@ export function ProposalViewer({
                 </ScrollArea>
             </CardContent>
             <CardFooter className="flex justify-between">
+                {/*<Button variant="outline" onClick={() => onSubmit(false, reviewedProposal)}>Reject Proposal</Button>*/}
+                {/*<Button onClick={() => onSubmit(true, reviewedProposal)}>Approve Proposal</Button>*/}
                 <Button variant="outline" onClick={() => handleSubmit(false)}>Reject Proposal</Button>
                 <Button onClick={() => handleSubmit(true)}>Approve Proposal</Button>
             </CardFooter>
