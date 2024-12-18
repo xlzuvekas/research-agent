@@ -11,7 +11,7 @@ from langgraph.graph import StateGraph, START, END, add_messages
 from langchain_core.runnables import RunnableConfig
 from langgraph.types import Command
 
-from copilotkit.langchain import copilotkit_emit_state, copilotkit_customize_config, copilotkit_exit
+from copilotkit.langchain import copilotkit_emit_state, copilotkit_customize_config, copilotkit_exit, copilotkit_emit_message
 
 from state import ResearchState
 from tools.tavily_search import tavily_search
@@ -56,6 +56,7 @@ class MasterAgent:
 
         workflow.add_edge("tools", "agent")
         workflow.add_edge("human", "human_response")
+        workflow.add_edge("human_response", "agent")
         workflow.add_edge("agent", END)
 
         # Compile the graph and save it interrupt_after=["planner"]
@@ -103,19 +104,21 @@ class MasterAgent:
         print('********')
         messages = state['messages']
         last_message = messages[-1]
-        print(last_message)
+        print("in human: ",last_message)
+        print("ALL MSGS: ", messages)
         pass
 
     async def human_response(self, state: ResearchState, config: RunnableConfig):
+        print("IN HUNAN RESPONSE")
         config = copilotkit_customize_config(
             config,
             emit_messages=True,  # make sure to enable emitting messages to the frontend
         )
         await copilotkit_exit(config)
-        return Command(
-            goto='agent',
-            update=state
-        )
+        await copilotkit_emit_message(config, "✅ Got answer")
+        last_message = cast(ToolMessage, state["messages"][-1])
+        print("ALL msgs:\n\n{}".format(state["messages"]))
+        return state
 
     # Invoke a model with research tools to gather data about the company
     async def call_model(self, state: ResearchState, config: RunnableConfig):
@@ -150,10 +153,6 @@ class MasterAgent:
         proposal = state.get("proposal", {})
         # Extract sections with "approved": True
         if proposal:
-            # TODO: Should we add this?
-            # if proposal["approved"] == True:
-
-
             print('proposal:')
             print(proposal)
             outline = {k: {'title': v['title'], 'description': v['description']} for k, v in
@@ -168,15 +167,15 @@ class MasterAgent:
                     "### Next Steps\n"
                     "Based on the current progress, determine the next sections to complete or refine. Ensure to follow the outline and user requirements closely.\n"
                 )
-        print(prompt)
+        print("prompt: ", prompt)
 
         model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
         config = copilotkit_customize_config(config, emit_tool_calls=True)
         ainvoke_kwargs = {}
         ainvoke_kwargs["parallel_tool_calls"] = False
-        print('*****TOOL*****')
-        print(state["copilotkit"]["actions"])
-        print('**********')
+        # print('*****TOOL*****')
+        # print(state["copilotkit"]["actions"])
+        # print('**********')
         for tool in state["copilotkit"]["actions"]:
             self.tools_by_name[tool["name"]] = tool
 
@@ -191,17 +190,6 @@ class MasterAgent:
         response = cast(AIMessage, response)
 
         return {"messages": response}
-
-    # async def start_node(self, state: ResearchState):
-    #     print("start_node")
-    #     if state.get("proposal", {}).get("approved", False):
-    #         goto = 'agent'
-    #     else:
-    #         goto = 'planner'
-    #
-    #     return Command(
-    #         goto=goto
-    #     )
 
     # Define the function that decides whether to continue research using tools or proceed to writing the report
     def should_continue(self, state: ResearchState) -> Literal["tools", "human", "end"]:
