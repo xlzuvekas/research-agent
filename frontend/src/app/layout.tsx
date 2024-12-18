@@ -4,6 +4,7 @@ import "./globals.css";
 import { CopilotKit } from "@copilotkit/react-core";
 import { Noto_Serif, Lato } from "next/font/google";
 import { ResearchProvider } from "@/components/research-context";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const lato = Lato({
     subsets: ['latin'],
@@ -32,9 +33,11 @@ export default function RootLayout({
         <html lang="en" className="h-full">
             <body className={`${lato.variable} ${noto.className} antialiased h-full`}>
                 <CopilotKit runtimeUrl="/api/copilotkit" showDevConsole={false} agent="agent">
-                    <ResearchProvider>
-                        {children}
-                    </ResearchProvider>
+                    <TooltipProvider>
+                        <ResearchProvider>
+                            {children}
+                        </ResearchProvider>
+                    </TooltipProvider>
                 </CopilotKit>
             </body>
         </html>

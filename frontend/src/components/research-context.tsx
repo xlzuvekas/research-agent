@@ -2,28 +2,15 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react'
 import type { ResearchState } from '@/lib/types'
-import { useCoAgent } from "@copilotkit/react-core";
+import { useCoAgent, useCopilotChat } from "@copilotkit/react-core";
 import useLocalStorage from "@/lib/hooks/useLocalStorage";
-
-const initialState: ResearchState = {
-    title: '',
-    outline: {},
-    intro: '',
-    sections: [],
-    conclusion: '',
-    footer: '',
-    sources: {},
-    cited_sources: {},
-    tool: '',
-    messages: [],
-    logs: [],
-}
 
 interface ResearchContextType {
     state: ResearchState;
     setResearchState: (state: ResearchState) => void
     sourcesModalOpen: boolean
     setSourcesModalOpen: (open: boolean) => void
+    running: boolean
 }
 
 const ResearchContext = createContext<ResearchContextType | undefined>(undefined)
@@ -34,7 +21,8 @@ export function ResearchProvider({ children }: { children: ReactNode }) {
         name: 'agent',
         initialState: {},
     });
-    // @ts-expect-error -- sdafsd
+    const { isLoading } = useCopilotChat()
+    // @ts-expect-error -- force instantiate with null
     const [localStorageState, setLocalStorageState] = useLocalStorage<ResearchState>('research', null);
 
     useEffect(() => {
@@ -55,7 +43,7 @@ export function ResearchProvider({ children }: { children: ReactNode }) {
     }, [coAgentState, localStorageState, setCoAgentsState, setLocalStorageState]);
 
     return (
-        <ResearchContext.Provider value={{ state: coAgentState, setResearchState: setCoAgentsState, setSourcesModalOpen, sourcesModalOpen }}>
+        <ResearchContext.Provider value={{ state: coAgentState, setResearchState: setCoAgentsState, setSourcesModalOpen, sourcesModalOpen, running: isLoading }}>
             {children}
         </ResearchContext.Provider>
     )

@@ -17,7 +17,7 @@ export default function ViewEditToggle({
                 "h-8 px-2 rounded-none bg-white",
                 selected ? "bg-blue-50" : "hover:bg-gray-200",
                 "active:bg-gray-300",
-                disabled && "opacity-50 cursor-not-allowed hover:bg-white"
+                disabled && "opacity-50 cursor-not-allowed bg-gray-100"
             )
 
   return (
