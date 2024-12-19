@@ -10,6 +10,8 @@ Powered by [LangGraph](https://www.langchain.com/langgraph), it simplifies compl
    </a>
 </p>
 
+![tavily-demo](https://github.com/user-attachments/assets/70c7db1b-de5b-4fb2-b447-09a3a1b78d73)
+
 ## Prerequisites
 
 ### 📦 Necessary tools
@@ -29,9 +31,6 @@ You'll need API keys for the following services:
 
 ## 🚀 Getting Started
 
-![tavily-demo](https://github.com/user-attachments/assets/70c7db1b-de5b-4fb2-b447-09a3a1b78d73)
-
-## 👨‍💻 Running the UI
 There are two main components to this demo: the `agent` and the `frontend`. Both need to be running to use the app.
 
 ### 💻 Running the Agent
