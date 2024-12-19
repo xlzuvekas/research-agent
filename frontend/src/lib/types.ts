@@ -26,12 +26,13 @@ export enum ProposalSectionName {
     Sections = "sections",
 }
 
-export type IProposalItem = Record<ProposalSectionName, ProposalSection> & { description: string }
+export type IProposalItem = Record<string, ProposalSection>
 
 export interface Proposal {
     [ProposalSectionName.Sections]: IProposalItem
     timestamp: string
     approved: boolean
+    remarks?: string,
 }
 
 // This interface corresponds to the state defined in agent/state.py
