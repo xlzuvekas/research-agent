@@ -214,20 +214,6 @@ class MasterAgent:
         # If no conditions are met or if it's not an AIMessage, return "end" to stop
         return "end"
 
-    # Define an async function to run your graph code
-    # async def run_graph(self):
-    #     graph = self.graph
-    #     messages = [
-    #         HumanMessage(content="Please run research on Tavily company")
-    #     ]
-    #     async for s in graph.astream({"messages": messages}, stream_mode="values"):
-    #         message = s["messages"][-1]
-    #         if isinstance(message, tuple):
-    #             print(message)
-    #         else:
-    #             message.pretty_print()
-
-
 # #Run the async function
 #    # used for running graph locally
 #    #Define an async function to run your graph code
