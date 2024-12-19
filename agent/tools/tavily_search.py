@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 from tavily import AsyncTavilyClient
 from typing import TypedDict, List, Annotated, Literal, Dict, Union, Optional
 from langchain_core.runnables import RunnableConfig
-
+from pdb import set_trace as bp
 load_dotenv('.env')
 tavily_client = AsyncTavilyClient()
 
@@ -17,7 +17,7 @@ tavily_client = AsyncTavilyClient()
 class TavilyQuery(BaseModel):
     query: str = Field(description="Web search query")
     topic: str = Field(
-        description="Type of search, should be 'general' or 'news'. Choose 'news' ONLY when the company you searching is publicly traded and is likely to be featured on popular news")
+        description="Type of search, MUST be 'general' or 'news'. Choose 'news' ONLY when the company you searching is publicly traded and is likely to be featured on popular news")
     days: int = Field(description="Number of days back to run 'news' search")
     domains: Optional[List[str]] = Field(default=None,
                                          description="List of domains to include in the research. Useful when trying to gather information from trusted and relevant domains")
@@ -37,8 +37,10 @@ async def tavily_search(sub_queries: List[TavilyQuery], state):
         try:
             # Add date to the query as we need the most recent results
             query_with_date = f"{itm.query} {datetime.now().strftime('%m-%Y')}"
-            tavily_response = await tavily_client.search(query=query_with_date, topic=itm.topic, days=itm.days, max_results=10)
+            topic = itm.topic if itm.topic in ['general','news'] else "general"
+            tavily_response = await tavily_client.search(query=query_with_date, topic=topic, days=itm.days, max_results=10)
             state["logs"][index]["done"] = True
+            tavily_response['results'] = [search for search in tavily_response['results'] if search['score'] > 0.45]
             await copilotkit_emit_state(config, state)
             return tavily_response['results']
         except Exception as e:
