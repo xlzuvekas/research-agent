@@ -34,7 +34,7 @@ async def tavily_extract(urls, state):
         config = RunnableConfig()
         state["logs"] = state.get("logs", [])
         state["logs"].append({
-            "message": tool_msg,
+            "message": "🚀 Extracting additional content from valuable sources",
             "done": True
         })
         await copilotkit_emit_state(config, state)

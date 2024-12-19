@@ -32,7 +32,7 @@ async def section_writer(research_query, section_title, idx, state):
     # Log search queries
     state["logs"] = state.get("logs", [])
     state["logs"].append({
-        "message": f"Writing the {section_title} section...",
+        "message": f"📝 Writing the {section_title} section...",
         "done": False
     })
     await copilotkit_emit_state(config, state)
