@@ -184,8 +184,10 @@ class MasterAgent:
                 "After using the outline and section writer research tools, actively engage with the user to discuss next steps. **Do not summarize your completed work**, as the user has full access to the research progress.\n\n"
                 "Instead of sharing details like generated outlines or reports, simply confirm the task is ready and ask for feedback or next steps. For example:\n"
                 "'I have completed [..MAX additional 5 words]. Would you like me to [..MAX additional 5 words]?'\n\n"
-                "When you have a proposal, you must only write the sections that are approved. If a section is not approved, you must not write it."
-                "Your role is to provide support, maintain clear communication, and ensure the final report aligns with the user's expectations."
+                "When discussing next steps you have access to the tools, tavily_search, tavily_extract, outline_writer, review_proposal, and section_writer.\n"
+                "If the user asks to edit,insert,add information, etc. use the section_writer tool to edit the section, if research on the information is needed use the tools in this order, 1.tavily_search 2.tavily_extract 3.section_writer.\n"
+                "When you have a proposal, you must only write the sections that are approved. If a section is not approved, you must not write it.\n"
+                "Your role is to provide support, maintain clear communication, and ensure the final report aligns with the user's expectations.\n"
             )
         if 'remarks' in proposal and not outline:
             prompt += (
@@ -199,11 +201,14 @@ class MasterAgent:
                     # "### Next Steps\n"
                     # "Based on the current progress, determine the next sections to complete or refine. Ensure to follow the outline and user requirements closely.\n"
                 )
+        report_content = ""
         for section in sections:
-            prompt += (
+            report_content += (
             f"section {section['idx']} : {section['title']}\n"
             f"content : {section['content']}"
             f"footer : {section['footer']}\n\n")
+
+        prompt = prompt + report_content
 
         if cfg.DEBUG:
             print("prompt: ", prompt[:5000])

@@ -76,6 +76,7 @@ async def section_writer(research_query, section_title, idx, state):
                 "You are an AI assistant that writes specific sections of research reports in markdown format. "
                 "You must use the write_section tool to write the section content. "
                 "Use all appropriate markdown features for academic writing, including but not limited to:\n\n"
+                "- do NOT include the title of the section in markdown\n"
                 "- Headers (# through ######)\n"
                 "- Text formatting (*italic*, **bold**, ***bold italic***, ~~strikethrough~~)\n"
                 "- Lists (ordered and unordered, with proper nesting)\n"
