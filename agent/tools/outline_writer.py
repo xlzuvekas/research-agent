@@ -114,6 +114,10 @@ async def outline_writer(research_query, state):
         tool_msg = f"Generated the following outline proposal:\n{response}"
         state["proposal"] = proposal
 
+        # Clear logs
+        state["logs"] = []
+        await copilotkit_emit_state(config, state)
+
         return state, tool_msg
     except (json.JSONDecodeError, ValueError) as e:
         # Create fallback structure using same keys
@@ -125,6 +129,10 @@ async def outline_writer(research_query, state):
             "error": str(e)
         })
         state["proposal"] = fallback
+
+        # Clear logs
+        state["logs"] = []
+        await copilotkit_emit_state(config, state)
 
         return state, f"Error generating outline proposal: {e}"
 
