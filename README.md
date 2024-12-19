@@ -27,7 +27,7 @@ Before you begin, ensure the following is installed:
 First, navigate to the frontend and install the dependencies:
 
    ```bash
-   cd ./frontend
+   cd frontend
    pnpm install
    ```
 
