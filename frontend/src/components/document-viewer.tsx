@@ -76,8 +76,9 @@ export function DocumentViewer({
                         <h4 className="text-[10px] w-full text-center">{title}</h4>
                     ) : (
                         <div className="text-sm prose">
+                            <h4 className={"text-xl font-semibold mb-4 w-full"}>{title}</h4>
                             <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
-                            {footer?.length ? <Footer footer={footer ?? ''} /> : null}
+                            {footer?.length ? <Footer footer={footer ?? ''}/> : null}
                         </div>
                     )}
                 </div>
