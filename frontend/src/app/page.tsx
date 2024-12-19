@@ -92,10 +92,10 @@ export default function HomePage() {
 
     return (
         <div
-            className="h-screen bg-[#FAF9F6] text-[#3D2B1F] font-lato">
-            <div className="grid h-full" style={{ gridTemplateColumns: 'auto 1fr' }}>
+            className="h-screen bg-[#FAF9F6] text-[#3D2B1F] font-lato 2xl:px-[8vw]">
+            <div className="grid h-full border-black/10 border-y-0" style={{ gridTemplateColumns: 'auto 1fr' }}>
                 {/* Toolbar */}
-                <Toolbar />
+                {/*<Toolbar />*/}
 
                 {/* Main Chat Window */}
                 <div className="flex h-full overflow-hidden" ref={containerRef}>

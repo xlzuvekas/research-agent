@@ -82,7 +82,7 @@ export function DocumentsView({ sections, selectedSection, onSelectSection, stre
                 </div>
             ) : (
                 sections.length ? (
-                    <div className="overflow-auto space-y-4">
+                    <div className="overflow-auto space-y-4 flex-1">
                         {sections?.map(section => (
                                 <DocumentViewer
                                     key={section.id}
