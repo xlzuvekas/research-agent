@@ -1,8 +1,10 @@
 import { Section } from "@/lib/types";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import DocumentOptions from "@/components/document-options";
 import { DocumentsScrollbar } from "@/components/documents-scrollbar";
 import { DocumentViewer } from "@/components/document-viewer";
+import { useResearch } from "@/components/research-context";
+import { DocumentOptionsState } from "@/types/document-options-state";
 
 interface DocumentsViewProps {
     sections: Section[];
@@ -12,12 +14,16 @@ interface DocumentsViewProps {
 }
 
 export function DocumentsView({ sections, selectedSection, onSelectSection, streamingSection }: DocumentsViewProps) {
-    const [zoomLevel, setZoomLevel] = useState(100);
+    const { state, setResearchState, running } = useResearch()
     const [viewableSection, setViewableSection] = useState(selectedSection)
+    const [documentOptionsState, setDocumentOptionsState] = useState<DocumentOptionsState>({ mode: 'full', editMode: false, zoom: 100 })
 
-    const handleZoomChange = (value: string | number) => {
-        setZoomLevel(Number(value));
-    };
+    const handleSectionEdit = useCallback((editedSection: Section) => {
+        setResearchState({
+            ...state,
+            sections: state.sections.map(section => section.id === editedSection.id ? editedSection : section)
+        })
+    }, [setResearchState, state])
 
     useEffect(() => {
         if (selectedSection) {
@@ -30,25 +36,73 @@ export function DocumentsView({ sections, selectedSection, onSelectSection, stre
         }
     }, [streamingSection, selectedSection]);
 
+    const emptyState = useMemo(() => {
+        let placeholder = 'Start by asking a research question in the chat'
+        if (running && !sections.length) {
+            placeholder = 'The agent is running. Once a research was created, it will show up here'
+        }
+        if (sections.length) {
+            placeholder = 'Pick a section from the sections tab to the right, to view and edit'
+        }
+        return (
+            <DocumentViewer
+                editMode={false}
+                onSectionEdit={handleSectionEdit}
+                zoomLevel={documentOptionsState.zoom}
+                placeholder={placeholder}
+            />
+        )
+    }, [sections.length, running, documentOptionsState.zoom, handleSectionEdit])
+
     return (
         <div className="flex flex-col flex-1 overflow-y-hidden h-full p-4">
-            <DocumentOptions onZoomChange={handleZoomChange}/>
+            <DocumentOptions
+                onChange={change => setDocumentOptionsState(prev => ({ ...prev, ...change }))}
+                state={documentOptionsState}
+                canEdit={Boolean(!running && sections.length && (viewableSection || documentOptionsState.mode === 'full'))}
+            />
 
-            <div className="flex flex-1 overflow-hidden">
-                {/* Selected section view on the left */}
-                {viewableSection ? (
-                    <DocumentViewer
-                        section={viewableSection}
-                        zoomLevel={zoomLevel}
-                        onSelect={onSelectSection}
-                    />
-                ) : (
-                    <DocumentViewer zoomLevel={zoomLevel} placeholder={sections.length ? "Pick a section from the sections tab to the right, to view and edit" : 'Start by asking a research question in the chat'} />
-                )}
+            {documentOptionsState.mode === 'section' ? (
+                <div className="flex flex-1 overflow-hidden">
+                    {/* Selected section view on the left */}
+                    {viewableSection ? (
+                        <DocumentViewer
+                            section={viewableSection}
+                            zoomLevel={documentOptionsState.zoom}
+                            onSelect={onSelectSection}
+                            onSectionEdit={handleSectionEdit}
+                            editMode={documentOptionsState.editMode}
+                        />
+                    ) : emptyState}
 
-                {/* Scrollable thumbnails on the right */}
-                <DocumentsScrollbar sections={sections} selectedSectionId={selectedSection?.id} onSelectSection={onSelectSection} />
-            </div>
+                    {/* Scrollable thumbnails on the right */}
+                    {sections.length > 0 && (
+                        <DocumentsScrollbar
+                            sections={sections}
+                            selectedSectionId={selectedSection?.id}
+                            onSelectSection={onSelectSection}
+                        />
+                    )}
+                </div>
+            ) : (
+                sections.length ? (
+                    <div className="overflow-auto px-2 space-y-4">
+                        {sections?.map(section => (
+                                <DocumentViewer
+                                    key={section.id}
+                                    section={section}
+                                    zoomLevel={100}
+                                    highlight={false}
+                                    compact={false}
+                                    onSelect={() => {
+                                    }}
+                                    onSectionEdit={handleSectionEdit}
+                                    editMode={documentOptionsState.editMode}
+                                />
+                            ))}
+                    </div>
+                ) : emptyState
+            )}
         </div>
     )
 }

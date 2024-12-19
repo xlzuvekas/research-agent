@@ -75,6 +75,11 @@ async def tavily_search(sub_queries: List[TavilyQuery], state):
         state["logs"][i]["done"] = True
         await copilotkit_emit_state(config, state)
 
+    for key,val in sources.items():
+        if not sources[key].get('title',None):
+            sources[key]['title'] = 'No Title, Invalid Link'
+
+
     state['sources'] = sources
 
     return state, tool_msg

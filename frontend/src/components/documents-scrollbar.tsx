@@ -2,6 +2,7 @@ import React from "react";
 import { DocumentViewer } from "@/components/document-viewer";
 import { Section } from "@/lib/types";
 import { ChevronLeft } from "lucide-react";
+import { NOOP } from "@/lib/utils";
 
 interface DocumentsScrollbarProps {
     sections: Section[];
@@ -25,6 +26,8 @@ export function DocumentsScrollbar({
                         compact
                         highlight={selectedSectionId === section.id}
                         onSelect={onSelectSection}
+                        editMode={false}
+                        onSectionEdit={NOOP}
                     />
                 ))}
             </div>
