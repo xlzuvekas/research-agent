@@ -6,6 +6,7 @@ import { DocumentViewer } from "@/components/document-viewer";
 import { useResearch } from "@/components/research-context";
 import { DocumentOptionsState } from "@/types/document-options-state";
 import { useCopilotChat } from "@copilotkit/react-core";
+import { cn } from "@/lib/utils";
 
 interface DocumentsViewProps {
     sections: Section[];
@@ -57,7 +58,7 @@ export function DocumentsView({ sections, selectedSection, onSelectSection, stre
     }, [sections.length, running, handleSectionEdit])
 
     return (
-        <div className="flex flex-col flex-1 overflow-y-hidden h-full p-4">
+        <div className={cn('flex flex-col flex-1 overflow-y-hidden h-full p-4', !sections.length ? 'pr-0' : '' )}>
             <DocumentOptions
                 onChange={change => setDocumentOptionsState(prev => ({ ...prev, ...change }))}
                 state={documentOptionsState}
