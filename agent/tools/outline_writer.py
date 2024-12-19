@@ -25,14 +25,6 @@ PROPOSAL_FORMAT = {
 
 PROPOSAL_KEYS = list(PROPOSAL_FORMAT.keys())
 
-# class Section:
-#     title: str = Field(description="Title of the section")
-#     description: str = Field(description="Description of the section")
-#     approved: bool
-#
-# class Proposal:
-#     sections: Dict[Section]
-
 class OutlineWriterInput(BaseModel):
     research_query: str = Field(description="Research query")
     state: Optional[Dict] = Field(description="State of the research")

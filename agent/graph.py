@@ -168,8 +168,6 @@ class MasterAgent:
                 prompt += (
                     f"### Current State of the Report\n"
                     f"\n**Approved Outline**:\n{outline}\n\n"
-                    # "### Next Steps\n"
-                    # "Based on the current progress, determine the next sections to complete or refine. Ensure to follow the outline and user requirements closely.\n"
                 )
         report_content = ""
         for section in sections:
@@ -205,12 +203,13 @@ class MasterAgent:
         last_message = messages[-1]
         # Only perform checks if the last message is an AIMessage
         if isinstance(last_message, AIMessage):
-            # If the LLM makes a regular tool call, route to the "tools" node
             if last_message.tool_calls:
                 for tool_call in last_message.tool_calls:
+                    # If the LLM makes a frontend tool call, route to the "human" node
                     # This essentially checks if the tool call is 'review_proposal', as it is the only frontend tool at the moment.
                     if tool_call['name'] in self.frontend_tools:
                         return "human"
+                # If the LLM makes a regular tool call, route to the "tools" node
                 return "tools"
         # If no conditions are met or if it's not an AIMessage, return "end" to stop
         return "end"
