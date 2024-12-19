@@ -5,6 +5,7 @@ import { DocumentsScrollbar } from "@/components/documents-scrollbar";
 import { DocumentViewer } from "@/components/document-viewer";
 import { useResearch } from "@/components/research-context";
 import { DocumentOptionsState } from "@/types/document-options-state";
+import { useCopilotChat } from "@copilotkit/react-core";
 
 interface DocumentsViewProps {
     sections: Section[];
@@ -14,7 +15,8 @@ interface DocumentsViewProps {
 }
 
 export function DocumentsView({ sections, selectedSection, onSelectSection, streamingSection }: DocumentsViewProps) {
-    const { state, setResearchState, running } = useResearch()
+    const { state, setResearchState } = useResearch()
+    const { isLoading: running } = useCopilotChat()
     const [viewableSection, setViewableSection] = useState(selectedSection)
     const [documentOptionsState, setDocumentOptionsState] = useState<DocumentOptionsState>({ mode: 'full', editMode: false, zoom: 100 })
 
@@ -62,7 +64,8 @@ export function DocumentsView({ sections, selectedSection, onSelectSection, stre
                 canEdit={Boolean(!running && sections.length && (viewableSection || documentOptionsState.mode === 'full'))}
             />
 
-            {documentOptionsState.mode === 'section' ? (
+            <div className="flex flex-1 overflow-hidden">
+                {documentOptionsState.mode === 'section' ? (
                 <div className="flex flex-1 overflow-hidden">
                     {/* Selected section view on the left */}
                     {viewableSection ? (
@@ -76,17 +79,10 @@ export function DocumentsView({ sections, selectedSection, onSelectSection, stre
                     ) : emptyState}
 
                     {/* Scrollable thumbnails on the right */}
-                    {sections.length > 0 && (
-                        <DocumentsScrollbar
-                            sections={sections}
-                            selectedSectionId={selectedSection?.id}
-                            onSelectSection={onSelectSection}
-                        />
-                    )}
                 </div>
             ) : (
                 sections.length ? (
-                    <div className="overflow-auto px-2 space-y-4">
+                    <div className="overflow-auto space-y-4">
                         {sections?.map(section => (
                                 <DocumentViewer
                                     key={section.id}
@@ -103,6 +99,14 @@ export function DocumentsView({ sections, selectedSection, onSelectSection, stre
                     </div>
                 ) : emptyState
             )}
+            {sections.length > 0 && (
+                        <DocumentsScrollbar
+                            sections={sections}
+                            selectedSectionId={selectedSection?.id}
+                            onSelectSection={onSelectSection}
+                        />
+                    )}
+            </div>
         </div>
     )
 }

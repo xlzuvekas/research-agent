@@ -17,7 +17,7 @@ PROPOSAL_FORMAT = {
         "section1": {  # Key is the name of the item
             "title": "Title of the item",
             "description": "Description of section1",
-            "approved": False,
+            "approved": True,
             # Defines if this goes in the final structure. Set only important parts to True by default
         }
     },

@@ -27,7 +27,6 @@ export default function HomePage() {
     useCoAgentStateRender<ResearchState>({
         name: 'agent',
         render: ({ state }) => {
-        // && researchState.proposal?.approved === false
             if (state.logs?.length > 0) {
                 return <Progress logs={state.logs} />;
             }
@@ -127,13 +126,6 @@ export default function HomePage() {
                 </div>
             </div>
             <SourcesModal />
-            {/* State Debug Section */}
-            {/* <div className="p-4 bg-gray-100 mt-4">
-                <h3 className="text-lg font-bold">State Debug:</h3>
-                <pre className="overflow-auto text-xs bg-white p-2 border">
-                    {JSON.stringify(researchState, null, 2)}
-                </pre>
-            </div> */}
         </div>
     );
 }

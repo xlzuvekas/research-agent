@@ -16,8 +16,8 @@ export function DocumentsScrollbar({
     selectedSectionId
 }: DocumentsScrollbarProps) {
     return (
-        <div className="group h-full z-10">
-            <div className="p-4 overflow-y-auto space-y-2 flex flex-col overflow-x-hidden border border-black/10 bg-[#FAF9F6] h-full relative">
+        <div className="group h-full">
+            <div className="p-2 overflow-y-auto space-y-2 flex flex-col overflow-x-hidden border border-black/10 bg-[#FAF9F6] h-full relative">
                 {sections?.map(section => (
                     <DocumentViewer
                         key={section.id}

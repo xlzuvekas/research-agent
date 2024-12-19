@@ -40,11 +40,8 @@ export interface ResearchState {
     outline: Record<string, unknown>;
     proposal: Proposal;
     // structure: Record<string, unknown>;
-    // intro: string;
     sections: Section[]; // Array of objects with 'title', 'content', and 'idx'
-    // conclusion: string;
     sources: Sources; // Dictionary with string keys and nested dictionaries
-    // cited_sources: Record<keyof Sources, string[]>; // Dictionary with string keys and an array of strings
     tool: string;
     messages: { [key: string]: unknown }[]; // Array of AnyMessage objects with potential additional properties
     logs: Log[];

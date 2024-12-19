@@ -5,21 +5,6 @@ import type { ResearchState } from '@/lib/types'
 import { useCoAgent } from "@copilotkit/react-core";
 import useLocalStorage from "@/lib/hooks/useLocalStorage";
 
-
-// const initialState: ResearchState = {
-//     title: '',
-//     outline: {},
-//     intro: '',
-//     sections: [],
-//     conclusion: '',
-//     footnotes: '',
-//     sources: {},
-//     cited_sources: {},
-//     tool: '',
-//     messages: [],
-//     logs: [],
-// }
-
 interface ResearchContextType {
     state: ResearchState;
     setResearchState: (newState: ResearchState | ((prevState: ResearchState) => ResearchState)) => void
@@ -36,7 +21,7 @@ export function ResearchProvider({ children }: { children: ReactNode }) {
         name: 'agent',
         initialState: {},
     });
-    // @ts-expect-error -- sdafsd
+    // @ts-expect-error -- force null
     const [localStorageState, setLocalStorageState] = useLocalStorage<ResearchState>('research', null);
 
     useEffect(() => {

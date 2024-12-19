@@ -5,7 +5,6 @@ import {
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DocumentOptionsState } from "@/types/document-options-state";
 import ViewEditToggle from "@/components/ui/view-edit-toggle";
 import { cn } from "@/lib/utils";
@@ -44,17 +43,6 @@ export default function DocumentOptions({
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-
-                <Select defaultValue="100" onValueChange={(value) => onChange({ zoom: Number(value) })}>
-                    <SelectTrigger className="w-[100px] bg-white">
-                        <SelectValue placeholder="View"/>
-                    </SelectTrigger>
-                    <SelectContent className="border border-black/10">
-                        <SelectItem value="100" className={getItemClass(state.zoom === 100)}>100%</SelectItem>
-                        <SelectItem value="75" className={getItemClass(state.zoom === 75)}>75%</SelectItem>
-                        <SelectItem value="50" className={getItemClass(state.zoom === 50)}>50%</SelectItem>
-                    </SelectContent>
-                </Select>
             </div>
 
             <div className="inline-flex bg-[#F5F0EA] rounded-md shadow-md p-1 h-[44px]">
