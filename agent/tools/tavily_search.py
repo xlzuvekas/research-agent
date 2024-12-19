@@ -36,6 +36,7 @@ async def tavily_search(sub_queries: List[TavilyQuery], state):
         try:
             # Add date to the query as we need the most recent results
             query_with_date = f"{itm.query} {datetime.now().strftime('%m-%Y')}"
+            # state["logs"][index]["message"] = f"🌐 Searched: '{query.query}'",
             topic = itm.topic if itm.topic in ['general','news'] else "general"
             tavily_response = await tavily_client.search(query=query_with_date, topic=topic, days=itm.days, max_results=10)
             state["logs"][index]["done"] = True
@@ -54,7 +55,7 @@ async def tavily_search(sub_queries: List[TavilyQuery], state):
     # Log search queries
     for query in sub_queries:
         state["logs"].append({
-            "message": f"Searching the web: '{query.query}'",
+            "message": f"🌐 Searching the web: '{query.query}'",
             "done": False
         })
     await copilotkit_emit_state(config, state)

@@ -82,13 +82,13 @@ async def outline_writer(research_query, state):
     config = RunnableConfig()
     state["logs"] = state.get("logs", [])
     state["logs"].append({
-        "message": "Thinking of a research proposal",
+        "message": "💭 Thinking of a research proposal",
         "done": False
     })
     await copilotkit_emit_state(config, state)
 
     state["logs"].append({
-        "message": "Generating the research proposal outline",
+        "message": "✨ Generating a research proposal outline",
         "done": False
     })
     state["logs"][-2]["done"] = True
@@ -113,6 +113,8 @@ async def outline_writer(research_query, state):
 
         tool_msg = f"Generated the following outline proposal:\n{response}"
         state["proposal"] = proposal
+
+        # Clear logs
         state["logs"] = []
         await copilotkit_emit_state(config, state)
 
@@ -127,6 +129,8 @@ async def outline_writer(research_query, state):
             "error": str(e)
         })
         state["proposal"] = fallback
+
+        # Clear logs
         state["logs"] = []
         await copilotkit_emit_state(config, state)
 
