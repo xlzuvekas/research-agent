@@ -22,6 +22,9 @@ Before you begin, ensure the following is installed:
 
 ## 🚀 Getting Started
 
+  ![tavily-demo](https://github.com/user-attachments/assets/70c7db1b-de5b-4fb2-b447-09a3a1b78d73)
+
+
 ## 👨‍💻 Running the UI
 
 First, navigate to the frontend and install the dependencies:
@@ -60,5 +63,4 @@ First, navigate to the frontend and install the dependencies:
    ```bash
    langgraph up
    ```
-  ![tavily-demo](https://github.com/user-attachments/assets/70c7db1b-de5b-4fb2-b447-09a3a1b78d73)
 
