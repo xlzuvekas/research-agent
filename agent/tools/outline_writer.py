@@ -119,7 +119,7 @@ async def outline_writer(research_query, state):
         await copilotkit_emit_state(config, state)
 
         return state, tool_msg
-    except (json.JSONDecodeError, ValueError) as e:
+    except Exception as e:
         # Create fallback structure using same keys
         fallback = {
             key: [] for key in PROPOSAL_KEYS
