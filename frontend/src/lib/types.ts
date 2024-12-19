@@ -1,4 +1,6 @@
 export interface Section { title: string; content: string; idx: number; footer?: string; id: string }
+// export interface Section { title: string; content: string; idx: number; footnotes?: string; id: string }
+
 
 export interface Source {
     content: string;
@@ -14,19 +16,39 @@ export interface Log {
     done: boolean;
 }
 
+export interface ProposalSection {
+    title: string;
+    description: string
+    approved: boolean
+}
+
+export enum ProposalSectionName {
+    Sections = "sections",
+}
+
+export type IProposalItem = Record<ProposalSectionName, ProposalSection> & { description: string }
+
+export interface Proposal {
+    [ProposalSectionName.Sections]: IProposalItem
+    timestamp: string
+    approved: boolean
+}
+
 // This interface corresponds to the state defined in agent/state.py
 export interface ResearchState {
     title: string;
     outline: Record<string, unknown>;
-    intro: string;
+    proposal: Proposal;
+    // structure: Record<string, unknown>;
+    // intro: string;
     sections: Section[]; // Array of objects with 'title', 'content', and 'idx'
-    conclusion: string;
+    // conclusion: string;
     sources: Sources; // Dictionary with string keys and nested dictionaries
-    cited_sources: Record<keyof Sources, string[]>; // Dictionary with string keys and an array of strings
+    // cited_sources: Record<keyof Sources, string[]>; // Dictionary with string keys and an array of strings
     tool: string;
     messages: { [key: string]: unknown }[]; // Array of AnyMessage objects with potential additional properties
     logs: Log[];
 }
 
-export type Document = Pick<ResearchState, 'sections' | 'title' | 'intro' | 'outline' | 'conclusion' | 'cited_sources'>
+// export type Document = Pick<ResearchState, 'sections' | 'title' | 'intro' | 'outline' | 'conclusion' | 'cited_sources'>
 

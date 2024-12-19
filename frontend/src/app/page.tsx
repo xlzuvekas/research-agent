@@ -4,13 +4,15 @@ import Toolbar from "@/components/toolbar";
 import Chat from "@/components/chat";
 import { useEffect, useRef, useState } from "react";
 import { GripVertical } from "lucide-react";
-import { useCoAgentStateRender } from "@copilotkit/react-core";
+import { useCoAgentStateRender, useCopilotAction } from "@copilotkit/react-core";
+
 import { ResearchState } from "@/lib/types";
 import { Progress } from "@/components/progress";
 import SourcesModal from "@/components/resource-modal";
 import { useResearch } from "@/components/research-context";
 import { DocumentsView } from "@/components/documents-view";
 import { useStreamingContent } from '@/lib/hooks/useStreamingContent';
+import { ProposalViewer } from "@/components/structure-proposal-viewer";
 
 const CHAT_MIN_WIDTH = 30;
 const CHAT_MAX_WIDTH = 50;
@@ -19,19 +21,37 @@ export default function HomePage() {
     const [chatWidth, setChatWidth] = useState(50) // Initial chat width in percentage
     const dividerRef = useRef<HTMLDivElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
-    const { state, setResearchState } = useResearch()
+    const { state: researchState, setResearchState } = useResearch()
 
+    // Handle all "logs" - The loading states that show what the agent is doing
     useCoAgentStateRender<ResearchState>({
         name: 'agent',
         render: ({ state }) => {
-            if (!state.logs || state.logs.length === 0) {
-                return null;
+        // && researchState.proposal?.approved === false
+            if (state.logs?.length > 0) {
+                return <Progress logs={state.logs} />;
             }
-            return <Progress logs={state.logs} />;
+            return null;
         },
+    }, [researchState]);
+
+    useCopilotAction({
+        name: "review_proposal",
+        description:
+            "Prompt the user to review structure proposal. Right after proposal generation",
+        available: "remote",
+        parameters: [],
+        renderAndWaitForResponse: ({ handler }) => (
+            <ProposalViewer
+                onSubmit={(approved, proposal) => handler?.({
+                            ...proposal,
+                            approved,
+                        })}
+            />
+        ),
     });
 
-    const streamingSection = useStreamingContent(state);
+    const streamingSection = useStreamingContent(researchState);
 
     useEffect(() => {
         const divider = dividerRef.current
@@ -67,7 +87,7 @@ export default function HomePage() {
     }, [])
     const {
         sections,
-    } = state
+    } = researchState
 
     const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
 
@@ -84,7 +104,7 @@ export default function HomePage() {
                         <Chat
                             onSubmitMessage={async () => {
                                 // clear the logs before starting the new research
-                                setResearchState({ ...state, logs: [] });
+                                setResearchState({ ...researchState, logs: [] });
                                 await new Promise((resolve) => setTimeout(resolve, 30));
                             }}
                         />
@@ -107,6 +127,13 @@ export default function HomePage() {
                 </div>
             </div>
             <SourcesModal />
+            {/* State Debug Section */}
+            {/* <div className="p-4 bg-gray-100 mt-4">
+                <h3 className="text-lg font-bold">State Debug:</h3>
+                <pre className="overflow-auto text-xs bg-white p-2 border">
+                    {JSON.stringify(researchState, null, 2)}
+                </pre>
+            </div> */}
         </div>
     );
 }

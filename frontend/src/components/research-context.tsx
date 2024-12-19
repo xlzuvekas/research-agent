@@ -2,27 +2,41 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react'
 import type { ResearchState } from '@/lib/types'
-import { useCoAgent, useCopilotChat } from "@copilotkit/react-core";
+import { useCoAgent } from "@copilotkit/react-core";
 import useLocalStorage from "@/lib/hooks/useLocalStorage";
+
+
+// const initialState: ResearchState = {
+//     title: '',
+//     outline: {},
+//     intro: '',
+//     sections: [],
+//     conclusion: '',
+//     footnotes: '',
+//     sources: {},
+//     cited_sources: {},
+//     tool: '',
+//     messages: [],
+//     logs: [],
+// }
 
 interface ResearchContextType {
     state: ResearchState;
-    setResearchState: (state: ResearchState) => void
+    setResearchState: (newState: ResearchState | ((prevState: ResearchState) => ResearchState)) => void
     sourcesModalOpen: boolean
     setSourcesModalOpen: (open: boolean) => void
-    running: boolean
+    runAgent: () => void
 }
 
 const ResearchContext = createContext<ResearchContextType | undefined>(undefined)
 
 export function ResearchProvider({ children }: { children: ReactNode }) {
     const [sourcesModalOpen, setSourcesModalOpen] = useState<boolean>(false)
-    const { state: coAgentState, setState: setCoAgentsState } = useCoAgent<ResearchState>({
+    const { state: coAgentState, setState: setCoAgentsState, run } = useCoAgent<ResearchState>({
         name: 'agent',
         initialState: {},
     });
-    const { isLoading } = useCopilotChat()
-    // @ts-expect-error -- force instantiate with null
+    // @ts-expect-error -- sdafsd
     const [localStorageState, setLocalStorageState] = useLocalStorage<ResearchState>('research', null);
 
     useEffect(() => {
@@ -43,7 +57,7 @@ export function ResearchProvider({ children }: { children: ReactNode }) {
     }, [coAgentState, localStorageState, setCoAgentsState, setLocalStorageState]);
 
     return (
-        <ResearchContext.Provider value={{ state: coAgentState, setResearchState: setCoAgentsState, setSourcesModalOpen, sourcesModalOpen, running: isLoading }}>
+        <ResearchContext.Provider value={{ state: coAgentState, setResearchState: setCoAgentsState as ResearchContextType['setResearchState'], setSourcesModalOpen, sourcesModalOpen, runAgent: run }}>
             {children}
         </ResearchContext.Provider>
     )

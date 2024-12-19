@@ -64,6 +64,7 @@ async def section_writer(research_query, section_title, idx, state):
         emit_intermediate_state=list(stream_states.values())
     )
 
+    outline = state.get("outline", {})
     sources = state.get("sources").values()
     section_exists = True if section['idx'] in [sec['idx'] for sec in state['sections']] else False
 
