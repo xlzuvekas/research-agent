@@ -83,7 +83,7 @@ You'll need this URL to run the frontend.
    # ...
    ```
 
-### 👨‍💻 Running the UI
+### 👨‍💻 Running the Frontend
 
 #### Install dependencies
 
