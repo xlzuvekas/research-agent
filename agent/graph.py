@@ -78,16 +78,10 @@ class MasterAgent:
             tool_state = {
                 "title": new_state.get("title", ""),
                 "outline": new_state.get("outline", {}),
-                # "intro": new_state.get("intro", ""),
                 "sections": new_state.get("sections", []),
-                # "conclusion": new_state.get("conclusion", ""),
-                # "footer": new_state.get("footer", []),
-                # "footnotes": new_state.get("footnotes", None),
                 "sources": new_state.get("sources", {}),
-                # "cited_sources": new_state.get("cited_sources", None),
                 "proposal": new_state.get("proposal", {}),
                 "logs": new_state.get("logs", []),
-                # "structure": new_state.get("structure", {}),
                 "tool": new_state.get("tool", {}),
                 "messages": msgs
             }
@@ -145,25 +139,9 @@ class MasterAgent:
         for tool in state["copilotkit"]["actions"]:
             self.frontend_tools.append(tool["name"])
 
-        # ai_messages =  [message.content for message in state['messages'] if isinstance(message, AIMessage)]
-        # most_recnt_ai_message = ai_messages[-1] if ai_messages else 'None'
-
         outline = state.get("outline", {})
         sections = state.get("sections", [])
         proposal = state.get("proposal", {})
-
-        # if not self.is_section_writing_done(outline,sections):
-            # prompt = f"""Today's date is {datetime.now().strftime('%d/%m/%Y')}.
-            #
-            # You are a highly skilled research agent, dedicated to helping users create comprehensive, well-sourced research reports. Your primary goal is to assist the user in producing a polished, professional report tailored to their needs.
-            #
-            # When writing a report:
-            # 1. Use the search tool to start the research and gather information from credible online sources.
-            # 2. Use the extract tool to extract additional information from relevant URLs.
-            # 3. Use the outline tool to analyze the gathered information and organize it into a clear, logical outline. Break the content into meaningful sections that will guide the report structure.
-            # 4. Use the section writer tool to write a section of the report. At the first pase you should write the full report base on the outline. Ensure the report is well-written, properly sourced, and easy to understand. Avoid responding with the text of the report directly—always use the SectionWrite tool for the final product.
-            # After completing the report, actively engage with the user to discuss next steps. For instance, ask if they need revisions, additional details, or further research. Keep the process interactive and collaborative.
-            # """
 
         prompt = (
                 f"Today's date is {datetime.now().strftime('%d/%m/%Y')}.\n"
@@ -204,31 +182,6 @@ class MasterAgent:
 
         if cfg.DEBUG:
             print("prompt: ", prompt)
-        # else:
-        #     prompt = f"""Today's date is {datetime.now().strftime('%d/%m/%Y')}.
-        #
-        #     You are a highly skilled research agent, dedicated to helping users create comprehensive, well-sourced research reports. You have completed the task of creating the report and now your primary goal is to assist the user in making changes to fit their needs.
-        #     Now that the report has been completed, actively engage with the user to discuss any changes they want made, you have full access to the state of the current report below.
-        #
-        #     When making changes to the report you must use:
-        #         - the request of the user
-        #         - the current state of the report
-        #         - all the tools at your disposal
-        #             - search tool, extract tool, outline tool, and the section writer tool
-        #             - The search tool and the extract tool must be used when the user is asking to add/insert/generate/research information.
-        #             - If the search tool is used the extract tool must be used right after the search tool
-        #             - After the search tool and extract tool have been used you must use the section writer tool to add the new information to the section.
-        #     the request of the user:
-        #     {[message.content for message in state['messages'] if isinstance(message, HumanMessage)][-1]}
-        #
-        #     current state of the report:
-        #     """
-        #     for section in state['sections']:
-        #         prompt += f"""
-        #         section {section["idx"]} : {section['title']}
-        #         content : {section["content"]}
-        #         footer : {section["footer"]} \n\n
-        #         """
 
         config = copilotkit_customize_config(config, emit_tool_calls=self.frontend_tools)  # emit only frontend tools
         ainvoke_kwargs = {}
@@ -245,32 +198,6 @@ class MasterAgent:
         response = cast(AIMessage, response)
 
         return {"messages": response}
-
-    # @staticmethod
-    # def is_section_writing_done(outline, sections):
-    #     # Define patterns or keywords that indicate completion
-    #     print(outline)
-    #     print("len outline: ", len(outline.keys()))
-    #     print("len sections: ", len(sections))
-    #     if sections and len(outline.keys()) == len(sections):
-    #         print("completed all sections")
-    #         return True
-    #     return False
-        # if message_content == 'None':
-        #     return False
-        #
-        # completion_patterns = [
-        #     r"has been completed",
-        #     r"summary of the sections included",
-        #     r"report on .* has been completed",
-        #     r"Would you like to review any specific section"
-        # ]
-        #
-        # # Check if any pattern matches the message content
-        # for pattern in completion_patterns:
-        #     if re.search(pattern, message_content, re.IGNORECASE):
-        #         return True
-        # return False
 
     # Define the function that decides whether to continue research using tools or proceed to writing the report
     def should_continue(self, state: ResearchState) -> Literal["tools", "human", "end"]:
