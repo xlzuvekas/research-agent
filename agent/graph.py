@@ -168,28 +168,19 @@ class MasterAgent:
         prompt = (
                 f"Today's date is {datetime.now().strftime('%d/%m/%Y')}.\n"
                 "You are an expert research assistant, dedicated to helping users create comprehensive, well-sourced research reports. Your primary goal is to assist the user in producing a polished, professional report tailored to their needs.\n\n"
-
-                # "When writing a report use the following research tools:\n"
-                # "1. Use the tavily_search tool to start the research and gather additional information from credible online sources when needed.\n"
-                # "2. Use the tavily_extract tool to extract additional content from relevant URLs.\n"
-                # "3. Use the outline_writer tool to analyze the gathered information and organize it into a clear, logical **outline proposal**. Break the content into meaningful sections that will guide the report structure. Avoid responding with the text of the outline directly—always use the outline_writer tool for the final product.\n"
-                # "4. After using the outline_write tool, YOU MUST use review_proposal tool. and pass the proposal as argument \n"
-                # "5. Use the section_writer tool to compose each section of the report based on the **approved outline**. Ensure the report is well-written, properly sourced, and easy to understand. Avoid responding with the text of the report directly—always use the SectionWrite tool for the final product.\n\n"
-
-                "To start the report writing process you must use the tools in the following order:\n"
-                "1. Use the tavily_search to start the research and gather additional information from credible online sources when needed.\n"
-                "2. Use the tavily_extract to extract additional content from relevant URLs.\n"
-                "3. Use the outline_writer to analyze the gathered information and organize it into a clear, logical **outline proposal**. Break the content into meaningful sections that will guide the report structure. Wait for outline approval before continuing to the next phase.\n"
-                "4. After using the outline_writer, YOU MUST use review_proposal tool. and pass the proposal as argument \n"
-                "5. Once proposal is approved use the section_writer tool to write each section of the report based on the **approved outline**, write all sections immediately without asking for feedback after writing each section. Ensure the report is well-written, properly sourced, and easy to understand. Avoid responding with the text of the report directly, always use the section_writer tool for the final product.\n\n"
+                "When writing a report use the following research tools:\n"
+                "1. Use the search tool to start the research and gather additional information from credible online sources when needed.\n"
+                "2. Use the extract tool to extract additional content from relevant URLs.\n"
+                "3. Use the outline tool to analyze the gathered information and organize it into a clear, logical **outline proposal**. Break the content into meaningful sections that will guide the report structure. Wait for outline approval before continuing to the next phase.\n"
+                "4. After using the outline tool, YOU MUST use review_proposal tool. and pass the proposal as argument \n"
+                "5. Use the section writer tool to compose each section of the report based on the **approved outline**. Ensure the report is well-written, properly sourced, and easy to understand. Avoid responding with the text of the report directly—always use the SectionWrite tool for the final product.\n\n"
                 "After using the outline and section writer research tools, actively engage with the user to discuss next steps. **Do not summarize your completed work**, as the user has full access to the research progress.\n\n"
                 "Instead of sharing details like generated outlines or reports, simply confirm the task is ready and ask for feedback or next steps. For example:\n"
                 "'I have completed [..MAX additional 5 words]. Would you like me to [..MAX additional 5 words]?'\n\n"
-                "When discussing next steps you have access to the tools, tavily_search, tavily_extract, outline_writer, review_proposal, and section_writer.\n"
-                "If the user asks to edit,insert,add information, etc. use the section_writer tool to edit the section, if research on the information is needed use the tools in this order, 1.tavily_search 2.tavily_extract 3.section_writer.\n"
-                "When you have a proposal, you must only write the sections that are approved. If a section is not approved, you must not write it.\n"
-                "Your role is to provide support, maintain clear communication, and ensure the final report aligns with the user's expectations.\n"
+                "When you have a proposal, you must only write the sections that are approved. If a section is not approved, you must not write it."
+                "Your role is to provide support, maintain clear communication, and ensure the final report aligns with the user's expectations."
             )
+
         if 'remarks' in proposal and not outline:
             prompt += (
                 f"**\nReviewed Proposal:**\n{proposal['sections']}\n"
@@ -198,7 +189,6 @@ class MasterAgent:
         if outline:
                 prompt += (
                     f"### Current State of the Report\n"
-                    f"Proposal has been approved\n"
                     f"\n**Approved Outline**:\n{outline}\n\n"
                     # "### Next Steps\n"
                     # "Based on the current progress, determine the next sections to complete or refine. Ensure to follow the outline and user requirements closely.\n"
@@ -210,10 +200,10 @@ class MasterAgent:
             f"content : {section['content']}"
             f"footer : {section['footer']}\n\n")
 
-        prompt = prompt + report_content
+        prompt += f"**Report**:\n\n{report_content}"
 
         if cfg.DEBUG:
-            print("prompt: ", prompt[:5000])
+            print("prompt: ", prompt)
         # else:
         #     prompt = f"""Today's date is {datetime.now().strftime('%d/%m/%Y')}.
         #
