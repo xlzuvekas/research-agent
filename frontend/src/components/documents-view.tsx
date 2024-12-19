@@ -18,7 +18,7 @@ export function DocumentsView({ sections, selectedSection, onSelectSection, stre
     const { state, setResearchState } = useResearch()
     const { isLoading: running } = useCopilotChat()
     const [viewableSection, setViewableSection] = useState(selectedSection)
-    const [documentOptionsState, setDocumentOptionsState] = useState<DocumentOptionsState>({ mode: 'full', editMode: false, zoom: 100 })
+    const [documentOptionsState, setDocumentOptionsState] = useState<DocumentOptionsState>({ mode: 'full', editMode: false })
 
     const handleSectionEdit = useCallback((editedSection: Section) => {
         setResearchState({
@@ -50,11 +50,11 @@ export function DocumentsView({ sections, selectedSection, onSelectSection, stre
             <DocumentViewer
                 editMode={false}
                 onSectionEdit={handleSectionEdit}
-                zoomLevel={documentOptionsState.zoom}
+                zoomLevel={100}
                 placeholder={placeholder}
             />
         )
-    }, [sections.length, running, documentOptionsState.zoom, handleSectionEdit])
+    }, [sections.length, running, handleSectionEdit])
 
     return (
         <div className="flex flex-col flex-1 overflow-y-hidden h-full p-4">
@@ -71,7 +71,7 @@ export function DocumentsView({ sections, selectedSection, onSelectSection, stre
                     {viewableSection ? (
                         <DocumentViewer
                             section={viewableSection}
-                            zoomLevel={documentOptionsState.zoom}
+                            zoomLevel={100}
                             onSelect={onSelectSection}
                             onSectionEdit={handleSectionEdit}
                             editMode={documentOptionsState.editMode}

@@ -1,6 +1,5 @@
 import type { Section as TSection } from "@/lib/types";
 import Footer from "@/components/document-footer";
-import { useDebounce } from "@/lib/hooks/useDebounce";
 
 export interface DocumentEditorProps {
     section: TSection;
