@@ -14,6 +14,7 @@ from langchain_core.runnables import RunnableConfig
 from copilotkit.langchain import copilotkit_emit_state, copilotkit_customize_config, copilotkit_exit, copilotkit_emit_message
 
 from state import ResearchState
+from config import Config
 from tools.tavily_search import tavily_search
 from tools.tavily_extract import tavily_extract
 from tools.outline_writer import outline_writer
@@ -21,6 +22,7 @@ from tools.section_writer import section_writer
 
 load_dotenv('.env')
 
+cfg = Config()
 
 class MasterAgent:
     def __init__(self):
@@ -96,9 +98,6 @@ class MasterAgent:
     @staticmethod
     def ask_human(state: ResearchState):
         # Define a fake node to ask human for feedback in frontend
-        messages = state['messages']
-        last_message = messages[-1]
-        print("in human: ",last_message)
         pass
 
     @staticmethod
@@ -110,7 +109,8 @@ class MasterAgent:
         )
         await copilotkit_exit(config)  # exit copilot after its frontend execution
         last_message = cast(ToolMessage, state["messages"][-1])
-        print("in feedback: ",last_message)
+        if cfg.DEBUG:
+            print("in get_feedback: ",last_message)
         if last_message.name == 'review_proposal':
             # Update proposal and outline
             reviewed_proposal = json.loads(last_message.content)
@@ -127,13 +127,10 @@ class MasterAgent:
         return state
 
     async def call_model(self, state: ResearchState, config: RunnableConfig):
-
-        print("call_model")
-
         # Check and cast the last message if needed
         last_message = state['messages'][-1]
-        print('last_message:')
-        print(last_message)
+        if cfg.DEBUG:
+             print(f"In call_model, last_message: {last_message}")
         allowed_types = (AIMessage, SystemMessage, HumanMessage, ToolMessage)
 
         if not isinstance(last_message, allowed_types):
@@ -147,8 +144,8 @@ class MasterAgent:
             # self.tools_by_name[tool["name"]] = tool
             self.frontend_tools.append(tool["name"])
 
-        ai_messages =  [message.content for message in state['messages'] if isinstance(message, AIMessage)]
-        most_recnt_ai_message = ai_messages[-1] if ai_messages else 'None'
+        # ai_messages =  [message.content for message in state['messages'] if isinstance(message, AIMessage)]
+        # most_recnt_ai_message = ai_messages[-1] if ai_messages else 'None'
 
         outline = state.get("outline", {})
         sections = state.get("sections", [])
@@ -195,7 +192,8 @@ class MasterAgent:
             f"content : {section['content']}"
             f"footer : {section['footer']}\n\n")
 
-        print("prompt: ", prompt)
+        if cfg.DEBUG:
+            print("prompt: ", prompt)
         # else:
         #     prompt = f"""Today's date is {datetime.now().strftime('%d/%m/%Y')}.
         #
@@ -222,12 +220,11 @@ class MasterAgent:
         #         footer : {section["footer"]} \n\n
         #         """
 
-        model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
         config = copilotkit_customize_config(config, emit_tool_calls=self.frontend_tools)  # emit only frontend tools
         ainvoke_kwargs = {}
         ainvoke_kwargs["parallel_tool_calls"] = False
 
-        response = await model.bind_tools(self.tools + state["copilotkit"]["actions"],
+        response = await cfg.FACTUAL_LLM.bind_tools(self.tools + state["copilotkit"]["actions"],
                                           **ainvoke_kwargs).ainvoke([
             SystemMessage(
                 content=prompt
@@ -239,16 +236,16 @@ class MasterAgent:
 
         return {"messages": response}
 
-    @staticmethod
-    def is_section_writing_done(outline, sections):
-        # Define patterns or keywords that indicate completion
-        print(outline)
-        print("len outline: ", len(outline.keys()))
-        print("len sections: ", len(sections))
-        if sections and len(outline.keys()) == len(sections):
-            print("completed all sections")
-            return True
-        return False
+    # @staticmethod
+    # def is_section_writing_done(outline, sections):
+    #     # Define patterns or keywords that indicate completion
+    #     print(outline)
+    #     print("len outline: ", len(outline.keys()))
+    #     print("len sections: ", len(sections))
+    #     if sections and len(outline.keys()) == len(sections):
+    #         print("completed all sections")
+    #         return True
+    #     return False
         # if message_content == 'None':
         #     return False
         #
