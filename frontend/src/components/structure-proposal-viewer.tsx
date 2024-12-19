@@ -25,7 +25,6 @@ function ProposalItem({
     return (
         <div>
             <h3 className="text-lg font-semibold">{title}</h3>
-            <p className="text-sm text-muted-foreground mb-2">{proposalItem.description}</p>
             {Object.entries(proposalItem).map(([key, section]) =>
                 typeof section === 'string' ? null : renderSection(proposalItemKey, key, section)
             )}
@@ -49,7 +48,6 @@ export function ProposalViewer({
     ) => {
         setReviewedProposal((prev) => {
             const newStructure = {...prev}
-            // @ts-expect-error -- ignore
             newStructure[sectionType][sectionKey].approved = checked
             return newStructure
         })
@@ -78,6 +76,7 @@ export function ProposalViewer({
                 id={`${sectionType}-${sectionKey}`}
                 checked={section.approved}
                 onCheckedChange={(checked) => handleCheckboxChange(sectionType, sectionKey, checked as boolean)}
+                className="border border-black/10 data-[state=checked]:text-[var(--primary)]"
             />
             <div className="grid gap-1.5 leading-none">
                 <label
@@ -119,8 +118,20 @@ export function ProposalViewer({
                 </ScrollArea>
             </CardContent>
             <CardFooter className="flex justify-between">
-                <Button onClick={() => handleSubmit(false)} className="text-red-500">Reject Proposal</Button>
-                <Button onClick={() => handleSubmit(true)} className="bg-[var(--primary)] text-white hover:bg-[#68330d]">Approve Proposal</Button>
+                <Button
+                    onClick={() => handleSubmit(false)}
+                    className="text-red-500"
+                    disabled={!reviewedProposal.remarks?.length}
+                >
+                    Reject Proposal
+                </Button>
+                <Button
+                    onClick={() => handleSubmit(true)}
+                    className="bg-[var(--primary)] text-white hover:bg-[#68330d]"
+                    disabled={!Object.values(reviewedProposal.sections).some(section => section.approved)}
+                >
+                    Approve Proposal
+                </Button>
             </CardFooter>
         </Card>
     )
