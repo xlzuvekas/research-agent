@@ -42,7 +42,7 @@ export function DocumentsView({ sections, selectedSection, onSelectSection, stre
     const emptyState = useMemo(() => {
         let placeholder = 'Start by asking a research question in the chat'
         if (running && !sections.length) {
-            placeholder = 'The agent is running. Once a research was created, it will show up here'
+            placeholder = 'The agent is running. As research is created, it will show up here'
         }
         if (sections.length) {
             placeholder = 'Pick a section from the sections tab to the right, to view and edit'
