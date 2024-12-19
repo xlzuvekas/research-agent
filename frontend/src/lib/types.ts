@@ -32,6 +32,7 @@ export interface Proposal {
     [ProposalSectionName.Sections]: IProposalItem
     timestamp: string
     approved: boolean
+    remarks?: string,
 }
 
 // This interface corresponds to the state defined in agent/state.py

@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Proposal, ProposalSection, ProposalSectionName } from "@/lib/types";
 import { useResearch } from "@/components/research-context";
+import { Textarea } from "@/components/ui/textarea";
 
 function ProposalItem({
     proposalItemKey,
@@ -39,7 +40,6 @@ export function ProposalViewer({
 }) {
     const { state } = useResearch()
     const proposal = state.proposal
-    console.log("state: ", proposal)
     const [reviewedProposal, setReviewedProposal] = useState(proposal)
 
     const handleCheckboxChange = (
@@ -51,9 +51,17 @@ export function ProposalViewer({
             const newStructure = {...prev}
             // @ts-expect-error -- ignore
             newStructure[sectionType][sectionKey].approved = checked
-            console.log("Updated proposal:", newStructure); // Log the new state after update
             return newStructure
         })
+    }
+
+    const handleRemarksChange = (
+        remarks: string
+    ) => {
+        setReviewedProposal((prev) => ({
+                ...prev,
+                remarks,
+            }))
     }
 
     const handleSubmit = useCallback((approved: boolean) => {
@@ -88,13 +96,25 @@ export function ProposalViewer({
             <CardHeader>
                 <CardTitle>Research Paper Proposal</CardTitle>
                 <CardDescription>
-                    I've prepared a proposal for structuring your research. Feel free to modify any sections or points to better match your needs - we can adjust until it's exactly what you're looking for.
+                    I&apos;ve prepared a proposal for structuring your research. Feel free to modify any sections or points to better match your needs - we can adjust until it&apos;s exactly what you&apos;re looking for.
                 </CardDescription>
             </CardHeader>
             <CardContent>
                 <ScrollArea className="h-[60vh] pr-4">
                     <div className="space-y-6">
                         {ProposalItem({ title: 'Sections', proposalItemKey: ProposalSectionName.Sections, proposal: reviewedProposal, renderSection })}
+                        <div className="space-y-2">
+                            <label htmlFor="remarks" className="text-sm font-medium">
+                                Additional Remarks
+                            </label>
+                            <Textarea
+                                id="remarks"
+                                placeholder="Enter any additional feedback or remarks..."
+                                className="min-h-[100px] border-black/10 resize-none"
+                                onChange={(e) => handleRemarksChange(e.target.value)}
+                                value={reviewedProposal.remarks}
+                            />
+                        </div>
                     </div>
                 </ScrollArea>
             </CardContent>
