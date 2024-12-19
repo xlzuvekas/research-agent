@@ -198,6 +198,7 @@ class MasterAgent:
         if outline:
                 prompt += (
                     f"### Current State of the Report\n"
+                    f"Proposal has been approved\n"
                     f"\n**Approved Outline**:\n{outline}\n\n"
                     # "### Next Steps\n"
                     # "Based on the current progress, determine the next sections to complete or refine. Ensure to follow the outline and user requirements closely.\n"
