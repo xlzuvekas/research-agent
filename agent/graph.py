@@ -86,6 +86,7 @@ class MasterAgent:
                 "sources": new_state.get("sources", {}),
                 # "cited_sources": new_state.get("cited_sources", None),
                 "proposal": new_state.get("proposal", {}),
+                "logs": new_state.get("logs", []),
                 # "structure": new_state.get("structure", {}),
                 "tool": new_state.get("tool", {}),
                 "messages": msgs
