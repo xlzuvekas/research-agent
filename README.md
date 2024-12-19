@@ -1,4 +1,4 @@
-# open-research-ANA
+# open-research-ANA 🔍
 
 This demo showcases ANA (Agent Native Application), a research canvas app that combines Human-in-the-Loop capabilities with [Tavily's](https://tavily.com/) real-time search and CopilotKit's agentic interface. 
 
@@ -12,119 +12,93 @@ Powered by [LangGraph](https://www.langchain.com/langgraph), it simplifies compl
 
 ![tavily-demo](https://github.com/user-attachments/assets/70c7db1b-de5b-4fb2-b447-09a3a1b78d73)
 
-## Prerequisites
+## Quick Start 🚀
 
-### 📦 Necessary tools
-Before you begin, ensure the following is installed:
+### 1. Prerequisites
 
 - [pnpm](https://pnpm.io/installation)
-- [Langgraph CLI](https://langchain-ai.github.io/langgraph/cloud/reference/cli/) (requires Docker to be installed and running)
 - [Docker](https://docs.docker.com/get-docker/)
+- [Langgraph CLI](https://langchain-ai.github.io/langgraph/cloud/reference/cli/)
 
-### 🔑 API keys
-
-You'll need API keys for the following services:
+### 2. API Keys Needed
 
 - [OpenAI](https://platform.openai.com/api-keys)
 - [Tavily](https://tavily.com/#pricing)
 - [LangSmith](https://docs.smith.langchain.com/administration/how_to_guides/organization_management/create_account_api_key)
+- [CopilotKit](https://cloud.copilotkit.ai)
 
-## 🚀 Getting Started
+### 3. Start the Agent
 
-There are two main components to this demo: the `agent` and the `frontend`. Both need to be running to use the app.
+```bash
+cd agent
 
-### 💻 Running the Agent
+# Create and populate .env
+cat << EOF > .env
+OPENAI_API_KEY=your_key
+TAVILY_API_KEY=your_key
+LANGSMITH_API_KEY=your_key
+EOF
 
-You have two options for running the agent: locally or remotely.
+# Start the agent
+langgraph up
 
-- If you want to run the agent remotely, you can do so by following the instructions in the [LangGraph Platform docs](https://langchain-ai.github.io/langgraph/cloud/deployment/cloud/). Once deployed, you can use the copy the deployment URL and skip this section.
+# Note the API URL from the output (e.g., http://localhost:8000)
+```
 
-- If you want to run the agent locally, you can do so by following the instructions below.
+### 4. Start the Frontend
 
-#### Navigate to the agent directory
+```bash
+cd frontend
+pnpm install
 
-   ```bash
-   cd agent
-   ```
+# Create and populate .env
+cat << EOF > .env
+LOCAL_DEPLOYMENT_URL=http://localhost:8000  # URL from langgraph up
+OPENAI_API_KEY=your_key
+LANGSMITH_API_KEY=your_key
+NEXT_PUBLIC_COPILOT_CLOUD_API_KEY=your_key
+EOF
 
-#### Set up your environment variables
+# Start the app
+pnpm run dev
+```
 
-Create a `.env` file:
+## Using with Copilot Cloud ☁️
 
-   ```bash
-   touch .env
-   ```
+You can use either a local agent or a LangGraph Platform deployment with Copilot Cloud:
 
-Then add your API keys to the `.env` file:
+### Option 1: Local Agent
+1. Create a tunnel to your local agent:
+```bash
+npx @copilotkit/cli tunnel 8000
+```
 
-   ```bash
-   # .env
-   OPENAI_API_KEY=your_openai_api_key_here
-   TAVILY_API_KEY=your_tavily_api_key_here
-   LANGSMITH_API_KEY=your_langsmith_api_key_here
-   ```
+### Option 2: LangGraph Platform
+1. Deploy your agent using [LangGraph Platform](https://langchain-ai.github.io/langgraph/cloud/deployment/cloud/)
+2. Use the deployment URL provided
 
-#### Start the Agent
+### Register the Endpoint
+For either option:
+1. Go to [Copilot Cloud](https://cloud.copilotkit.ai)
+2. Add a new Remote Endpoint
+3. Enter your tunnel URL or LangGraph Platform deployment URL
+4. Provide your `LANGSMITH_API_KEY`
+5. Test and Save
 
-   ```bash
-   langgraph up
-   ```
+## Deployment Options 🛠️
 
-#### Copy the agent URL
+### Local Development (Default)
+```bash
+pnpm run dev
+```
 
-Once you run `langgraph up`, you'll see some output. Grab the `API` URL from the output. 
+### Remote Agent
+```bash
+# Deploy agent using LangGraph Platform
+# Set DEPLOYMENT_URL in frontend/.env
+pnpm run remote-lgc-dev
+```
 
-You'll need this URL to run the frontend.
-
-   ```bash
-   $ langgraph up
-   # ...    
-   - API: http://localhost:<port> # Copy this URL!
-   # ...
-   ```
-
-### 👨‍💻 Running the Frontend
-
-#### Install dependencies
-
-First, navigate to the `frontend` directory and install the dependencies:
-
-   ```bash
-   cd frontend
-   pnpm install
-   ```
-
-#### Set up your environment variables
-
-Create a `.env` file:
-
-   ```bash
-   touch .env
-   ```
-
-Then add the following to the `.env` file:
-
-   ```bash
-   # .env
-   LOCAL_DEPLOYMENT_URL=http://localhost:<port> # local only, URL from "langgraph up"
-   DEPLOYMENT_URL=<deployment-url> # remote only, deploymentURL from LangGraph Platform
-   OPENAI_API_KEY=your_openai_api_key_here
-   LANGSMITH_API_KEY=your_langsmith_api_key_here
-   ```
-
-#### Start the application
-
-To use the **local version** of the agent (default):
-
-   ```bash
-   pnpm run dev
-   ```
-
-
-To use the **remote version** of the agent, you can use the following command:
-
-   ```bash
-   pnpm run remote-lgc-dev
-   ```
-
-This assumes you have deployed the agent and it is is accessible 
+## Documentation 📚
+- [CopilotKit Docs](https://docs.copilotkit.ai/coagents)
+- [LangGraph Platform Docs](https://langchain-ai.github.io/langgraph/cloud/deployment/cloud/)
