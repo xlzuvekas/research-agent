@@ -1,5 +1,9 @@
 # Matcopvili
 
+This demo showcases a research canvas app that combines Human-in-the-Loop capabilities with [Tavily's](https://tavily.com/) real-time search and CopilotKit's agentic interface. 
+
+Powered by [LangGraph](https://www.langchain.com/langgraph), it simplifies complex research tasks, making them more interactive and efficient.
+
 <p align="left">
   <br />
   <a href="https://docs.copilotkit.ai/coagents" rel="dofollow"><strong>Explore the docs »</strong></a>
