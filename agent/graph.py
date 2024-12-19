@@ -9,7 +9,6 @@ from langchain_core.messages import AnyMessage, AIMessage, SystemMessage, HumanM
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, START, END, add_messages
 from langchain_core.runnables import RunnableConfig
-from langgraph.types import Command
 
 from copilotkit.langchain import copilotkit_emit_state, copilotkit_customize_config, copilotkit_exit, copilotkit_emit_message
 
@@ -17,7 +16,6 @@ from state import ResearchState
 from tools.tavily_search import tavily_search
 from tools.tavily_extract import tavily_extract
 from tools.outline_writer import outline_writer
-# from agent.structure_planner import structure_planner
 from tools.section_writer import section_writer
 
 load_dotenv('.env')
@@ -27,17 +25,16 @@ class MasterAgent:
     def __init__(self):
         self.tools = [tavily_search, tavily_extract, outline_writer, section_writer]
         self.tools_by_name = {tool.name: tool for tool in self.tools}
+        self.frontend_tools = []  # Tools defined in the frontend using 'useCopilotAction'. These tools will be accessible in state["copilotkit"]["actions"]
 
         # Define a graph
         workflow = StateGraph(ResearchState)
 
         # Add nodes
-        # workflow.add_node("start_node", self.start_node)
-        # workflow.add_node("planner", structure_planner)
         workflow.add_node("agent", self.call_model)
         workflow.add_node("tools", self.tool_node)
         workflow.add_node("human", self.ask_human)
-        workflow.add_node("human_response", self.human_response)
+        workflow.add_node("feedback", self.get_feedback)
 
         # Set the entrypoint as route_query
         workflow.set_entry_point("agent")
@@ -55,8 +52,8 @@ class MasterAgent:
         )
 
         workflow.add_edge("tools", "agent")
-        workflow.add_edge("human", "human_response")
-        workflow.add_edge("human_response", "agent")
+        workflow.add_edge("human", "feedback")
+        workflow.add_edge("feedback", "agent")
         workflow.add_edge("agent", END)
 
         # Compile the graph and save it interrupt_after=["planner"]
@@ -95,31 +92,40 @@ class MasterAgent:
 
         return tool_state
 
-    # We define a fake node to ask the human
-    def ask_human(self, state: ResearchState):
-        print('********')
-        print('********')
-        print('here')
-        print('********')
-        print('********')
+
+    @staticmethod
+    def ask_human(state: ResearchState):
+        # Define a fake node to ask human for feedback in frontend
         messages = state['messages']
         last_message = messages[-1]
         print("in human: ",last_message)
-        print("ALL MSGS: ", messages)
         pass
 
-    async def human_response(self, state: ResearchState, config: RunnableConfig):
+    @staticmethod
+    async def get_feedback(state: ResearchState, config: RunnableConfig):
+        # Get feedback from frontend
         config = copilotkit_customize_config(
             config,
-            emit_messages=True,  # make sure to enable emitting messages to the frontend
+            emit_messages=True,  # enable emitting messages to the frontend
         )
-        await copilotkit_exit(config)
+        await copilotkit_exit(config)  # exit copilot after its frontend execution
         last_message = cast(ToolMessage, state["messages"][-1])
-        content = json.loads(last_message.content)
-        state["proposal"] = content
+        print("in feedback: ",last_message)
+        if last_message.name == 'review_proposal':
+            # Update proposal and outline
+            reviewed_proposal = json.loads(last_message.content)
+            if reviewed_proposal["approved"]:
+                state["proposal"] = reviewed_proposal
+
+                # Update outline with approved sections
+                outline = {k: {'title': v['title'], 'description': v['description']} for k, v in
+                           reviewed_proposal['sections'].items()
+                           if isinstance(v, dict) and v.get('approved')}
+
+                state['outline'] = outline
+
         return state
 
-    # Invoke a model with research tools to gather data about the company
     async def call_model(self, state: ResearchState, config: RunnableConfig):
         print("call_model")
 
@@ -145,23 +151,24 @@ class MasterAgent:
             "5. After using the outline tool, YOU MUST use review_proposal tool. and pass the proposal as argument \n"
             "After using the outline and section writer research tools, actively engage with the user to discuss next steps. **Do not summarize your completed work**, as the user has full access to the research progress.\n\n"
             "Instead of sharing details like generated outlines or reports, simply confirm the task is ready and ask for feedback or next steps. For example:\n"
-            "'I have completed [..MAX additional 5 words]. Would you like me to revisit any part or move forward?'\n\n"
+            "'I have completed [..MAX additional 5 words]. Would you like me to [..MAX additional 5 words]?'\n\n"
             "When you have a proposal, you must only write the sections that are approved. If a section is not approved, you must not write it."
             "Your role is to provide support, maintain clear communication, and ensure the final report aligns with the user's expectations."
         )
 
-        proposal = state.get("proposal", {})
-        # Extract sections with "approved": True
-        if proposal:
-            print('proposal:')
-            print(proposal)
-            outline = {k: {'title': v['title'], 'description': v['description']} for k, v in
-                       proposal['sections'].items()
-                       if isinstance(v, dict) and v.get('approved')}
-            print('outline: ')
-            print(outline)
-            if outline:
-                prompt += (
+        # proposal = state.get("proposal", {})
+        # # Extract sections with "approved": True
+        # if proposal:
+        #     print('proposal:')
+        #     print(proposal)
+        #     outline = {k: {'title': v['title'], 'description': v['description']} for k, v in
+        #                proposal['sections'].items()
+        #                if isinstance(v, dict) and v.get('approved')}
+        #     print('outline: ')
+        #     print(outline)
+        outline = state.get("outline", {})
+        if outline:
+            prompt += (
                     f"### Current State of the Report\n"
                     f"**Approved Outline**:\n{outline}\n\n"
                     "### Next Steps\n"
@@ -169,15 +176,17 @@ class MasterAgent:
                 )
         print("prompt: ", prompt)
 
+        # Keep list of frontend tools to know when to break to human node
+        for tool in state["copilotkit"]["actions"]:
+            # self.tools_by_name[tool["name"]] = tool
+            self.frontend_tools.append(tool["name"])
+
         model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-        config = copilotkit_customize_config(config, emit_tool_calls=['review_proposal'])
+        config = copilotkit_customize_config(config, emit_tool_calls=self.frontend_tools)  # emit only frontend tools
         ainvoke_kwargs = {}
         ainvoke_kwargs["parallel_tool_calls"] = False
-        # print('*****TOOL*****')
-        # print(state["copilotkit"]["actions"])
-        # print('**********')
-        for tool in state["copilotkit"]["actions"]:
-            self.tools_by_name[tool["name"]] = tool
+
+
 
         response = await model.bind_tools(self.tools + state["copilotkit"]["actions"],
                                           **ainvoke_kwargs).ainvoke([
@@ -201,7 +210,8 @@ class MasterAgent:
             # If the LLM makes a regular tool call, route to the "tools" node
             if last_message.tool_calls:
                 for tool_call in last_message.tool_calls:
-                    if tool_call['name'] == 'review_proposal':
+                    # This essentially checks if the tool call is 'review_proposal', as it is the only frontend tool at the moment.
+                    if tool_call['name'] in self.frontend_tools:
                         return "human"
                 return "tools"
 
