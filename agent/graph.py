@@ -167,12 +167,20 @@ class MasterAgent:
         prompt = (
                 f"Today's date is {datetime.now().strftime('%d/%m/%Y')}.\n"
                 "You are an expert research assistant, dedicated to helping users create comprehensive, well-sourced research reports. Your primary goal is to assist the user in producing a polished, professional report tailored to their needs.\n\n"
-                "When writing a report use the following research tools:\n"
-                "1. Use the tavily_search tool to start the research and gather additional information from credible online sources when needed.\n"
-                "2. Use the tavily_extract tool to extract additional content from relevant URLs.\n"
-                "3. Use the outline_writer tool to analyze the gathered information and organize it into a clear, logical **outline proposal**. Break the content into meaningful sections that will guide the report structure. Avoid responding with the text of the outline directly—always use the outline_writer tool for the final product.\n"
-                "4. After using the outline_write tool, YOU MUST use review_proposal tool. and pass the proposal as argument \n"
-                "5. Use the section_writer tool to compose each section of the report based on the **approved outline**. Ensure the report is well-written, properly sourced, and easy to understand. Avoid responding with the text of the report directly—always use the SectionWrite tool for the final product.\n\n"
+
+                # "When writing a report use the following research tools:\n"
+                # "1. Use the tavily_search tool to start the research and gather additional information from credible online sources when needed.\n"
+                # "2. Use the tavily_extract tool to extract additional content from relevant URLs.\n"
+                # "3. Use the outline_writer tool to analyze the gathered information and organize it into a clear, logical **outline proposal**. Break the content into meaningful sections that will guide the report structure. Avoid responding with the text of the outline directly—always use the outline_writer tool for the final product.\n"
+                # "4. After using the outline_write tool, YOU MUST use review_proposal tool. and pass the proposal as argument \n"
+                # "5. Use the section_writer tool to compose each section of the report based on the **approved outline**. Ensure the report is well-written, properly sourced, and easy to understand. Avoid responding with the text of the report directly—always use the SectionWrite tool for the final product.\n\n"
+
+                "To start the report writing process you must use the tools in the following order:\n"
+                "1. Use the tavily_search to start the research and gather additional information from credible online sources when needed.\n"
+                "2. Use the tavily_extract to extract additional content from relevant URLs.\n"
+                "3. Use the outline_writer to analyze the gathered information and organize it into a clear, logical **outline proposal**. Break the content into meaningful sections that will guide the report structure. Wait for outline approval before continuing to the next phase.\n"
+                "4. After using the outline_writer, YOU MUST use review_proposal tool. and pass the proposal as argument \n"
+                "5. Once the review proposal is done use the section_writer tool to write each section of the report based on the **approved outline**, write all sections immediately without asking for feedback after writing each section. Ensure the report is well-written, properly sourced, and easy to understand. Avoid responding with the text of the report directly, always use the section_writer tool for the final product.\n\n"
                 "After using the outline and section writer research tools, actively engage with the user to discuss next steps. **Do not summarize your completed work**, as the user has full access to the research progress.\n\n"
                 "Instead of sharing details like generated outlines or reports, simply confirm the task is ready and ask for feedback or next steps. For example:\n"
                 "'I have completed [..MAX additional 5 words]. Would you like me to [..MAX additional 5 words]?'\n\n"
@@ -183,7 +191,7 @@ class MasterAgent:
             prompt += (
                 f"**\nReviewed Proposal:**\n{proposal['sections']}\n"
                 f"User's feedback: {proposal['remarks']}"
-                "You must use the outline tool to write a new outline proposal that incorporates the user's feedback.")
+                "You must use the outline_writer tool to write a new outline proposal that incorporates the user's feedback.")
         if outline:
                 prompt += (
                     f"### Current State of the Report\n"
@@ -297,7 +305,7 @@ class MasterAgent:
     #             message.pretty_print()
 
 
-# Run the async function
+# #Run the async function
 #    # used for running graph locally
 #    #Define an async function to run your graph code
 #     async def run_graph(self):
