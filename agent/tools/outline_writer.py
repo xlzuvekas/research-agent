@@ -66,11 +66,6 @@ async def outline_writer(research_query, state):
                    f"Your Proposal:"
     }]
 
-    lc_messages = convert_openai_messages(prompt)
-    optional_params = {
-        "response_format": {"type": "json_object"}
-    }
-
     config = RunnableConfig()
     state["logs"] = state.get("logs", [])
     state["logs"].append({
@@ -86,13 +81,19 @@ async def outline_writer(research_query, state):
     state["logs"][-2]["done"] = True
     await copilotkit_emit_state(config, state)
 
-    response = ChatOpenAI(model='gpt-4o-mini', max_retries=1, model_kwargs=optional_params).invoke(lc_messages, config).content
-
-    for i, log in enumerate(state["logs"]):
-        state["logs"][i]["done"] = True
-    await copilotkit_emit_state(config, state)
-
     try:
+
+        lc_messages = convert_openai_messages(prompt)
+        optional_params = {
+            "response_format": {"type": "json_object"}
+        }
+
+        response = ChatOpenAI(model='gpt-4o-mini', max_retries=1, model_kwargs=optional_params).invoke(lc_messages, config).content
+
+        for i, log in enumerate(state["logs"]):
+            state["logs"][i]["done"] = True
+        await copilotkit_emit_state(config, state)
+
         proposal = json.loads(response)
 
         # Validate proposal structure using module-level keys

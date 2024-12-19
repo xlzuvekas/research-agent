@@ -147,35 +147,42 @@ async def section_writer(research_query, section_title, idx, state):
             )
         }]
 
-    # Convert prompts for OpenAI API
-    lc_messages = convert_openai_messages(prompt)
+    try:
+        # Convert prompts for OpenAI API
+        lc_messages = convert_openai_messages(prompt)
 
-    # Invoke OpenAI's model with tool
-    model = ChatOpenAI(model="gpt-4o-mini", max_retries=1)
-    response = model.bind_tools([WriteSection]).invoke(lc_messages, modified_config)
+        # Invoke OpenAI's model with tool
+        model = ChatOpenAI(model="gpt-4o-mini", max_retries=1)
+        response = model.bind_tools([WriteSection]).invoke(lc_messages, modified_config)
 
-    state["logs"][-1]["done"] = True
-    await copilotkit_emit_state(config, state)
+        state["logs"][-1]["done"] = True
+        await copilotkit_emit_state(config, state)
 
-    ai_message = cast(AIMessage, response)
-    if ai_message.tool_calls:
-        if ai_message.tool_calls[0]["name"] == "WriteSection":
-            section["title"] = ai_message.tool_calls[0]["args"].get("title", "")
-            section["content"] = ai_message.tool_calls[0]["args"].get("content", "")
-            section["footer"] = ai_message.tool_calls[0]["args"].get("footer", "")
+        ai_message = cast(AIMessage, response)
+        if ai_message.tool_calls:
+            if ai_message.tool_calls[0]["name"] == "WriteSection":
+                section["title"] = ai_message.tool_calls[0]["args"].get("title", "")
+                section["content"] = ai_message.tool_calls[0]["args"].get("content", "")
+                section["footer"] = ai_message.tool_calls[0]["args"].get("footer", "")
 
-    if section_exists:
-        state["sections"][section['idx']] = section
-    else:
-        state["sections"].append(section)
+        if section_exists:
+            state["sections"][section['idx']] = section
+        else:
+            state["sections"].append(section)
 
-    # Process each stream state
-    for stream_type, stream_info in stream_states.items():
-        if stream_info["state_key"] in state:
-            state[stream_info["state_key"]] = None
-    await copilotkit_emit_state(config, state)
+        # Process each stream state
+        for stream_type, stream_info in stream_states.items():
+            if stream_info["state_key"] in state:
+                state[stream_info["state_key"]] = None
+        await copilotkit_emit_state(config, state)
 
-    tool_msg = f"Wrote the {section_title} Section, idx: {idx}"
+        tool_msg = f"Wrote the {section_title} Section, idx: {idx}"
 
-    return state, tool_msg
+        return state, tool_msg
+    except Exception as e:
 
+        # Clear logs
+        state["logs"] = []
+        await copilotkit_emit_state(config, state)
+
+        return state, f"Error generating section: {e}"
