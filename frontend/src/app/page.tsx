@@ -1,6 +1,5 @@
 'use client'
 
-import Toolbar from "@/components/toolbar";
 import Chat from "@/components/chat";
 import { useEffect, useRef, useState } from "react";
 import { GripVertical } from "lucide-react";

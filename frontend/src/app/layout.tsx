@@ -25,14 +25,23 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-                                       children,
-                                   }: Readonly<{
+    children,
+}: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
         <html lang="en" className="h-full">
             <body className={`${lato.variable} ${noto.className} antialiased h-full`}>
-                <CopilotKit runtimeUrl="/api/copilotkit" showDevConsole={false} agent="agent">
+                <CopilotKit
+                    publicApiKey={process.env.NEXT_PUBLIC_COPILOT_CLOUD_API_KEY} // if using copilot cloud
+                    runtimeUrl={process.env.NEXT_PUBLIC_COPILOT_CLOUD_API_KEY ?
+                        // copilot cloud
+                        "https://api.cloud.copilotkit.ai/copilotkit/v1" :
+                        // local
+                        "/api/copilotkit"}
+                    showDevConsole={false}
+                    agent="agent"
+                >
                     <TooltipProvider>
                         <ResearchProvider>
                             {children}
