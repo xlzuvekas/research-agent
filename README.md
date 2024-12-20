@@ -15,12 +15,14 @@ Powered by [LangGraph](https://www.langchain.com/langgraph), it simplifies compl
 ## Quick Start 🚀
 
 ### 1. Prerequisites
+This projects uses the following tools:
 
 - [pnpm](https://pnpm.io/installation)
 - [Docker](https://docs.docker.com/get-docker/)
 - [Langgraph CLI](https://langchain-ai.github.io/langgraph/cloud/reference/cli/)
 
 ### 2. API Keys Needed
+Running locally, you'll need the following API keys:
 
 - [OpenAI](https://platform.openai.com/api-keys)
 - [Tavily](https://tavily.com/#pricing)
@@ -28,6 +30,8 @@ Powered by [LangGraph](https://www.langchain.com/langgraph), it simplifies compl
 - [CopilotKit](https://cloud.copilotkit.ai)
 
 ### 3. Start the Agent
+There are two main components to this project: the agent and the frontend. First, we'll start the agent. If you are
+using Copilot Cloud and LangGraph Platform, you can skip this step.
 
 ```bash
 cd agent
@@ -46,6 +50,7 @@ langgraph up
 ```
 
 ### 4. Start the Frontend
+Next, we'll start the frontend.
 
 ```bash
 cd frontend
@@ -64,8 +69,9 @@ pnpm run dev
 ```
 
 ## Using with Copilot Cloud ☁️
-
-You can use either a local agent or a LangGraph Platform deployment with Copilot Cloud:
+You can use either a local agent or a LangGraph Platform deployment with Copilot Cloud. Copilot Cloud is a 
+free to start hosted runtime for CopilotKit that allows you easily integrate your LangGraph Platform endpoints
+into your CopilotKit agent.
 
 ### Option 1: Local Agent
 1. Create a tunnel to your local agent:
