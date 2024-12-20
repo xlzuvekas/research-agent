@@ -59,7 +59,7 @@ class MasterAgent:
         workflow.add_edge("feedback", "agent")
         workflow.add_edge("agent", END)
 
-        # Compile the graph and save it interrupt_after=["planner"]
+        # Compile the graph, interrupt after human node to allow the frontend to invoke its tools.
         self.graph = workflow.compile(interrupt_after=['human'])
 
     # Define an async custom research tool node that access and updates the research state
@@ -92,29 +92,32 @@ class MasterAgent:
 
     @staticmethod
     def ask_human(state: ResearchState):
-        # Define a fake node to ask human for feedback in frontend
+        # Define a fake node to ask human for feedback via frontend tools
+        if cfg.DEBUG:
+            print("**In human** waiting for human feedback from frontend")
         pass
 
     @staticmethod
     async def get_feedback(state: ResearchState, config: RunnableConfig):
-        # Get feedback from frontend
+        # Process human feedback from frontend
         config = copilotkit_customize_config(
             config,
             emit_messages=True,  # enable emitting messages to the frontend
         )
-        await copilotkit_exit(config)  # exit copilot after its frontend execution
+        await copilotkit_exit(config)  # Exit CopilotKit after the execution of its frontend tool
         last_message = cast(ToolMessage, state["messages"][-1])
         if cfg.DEBUG:
-            print("in get_feedback: ",last_message)
+            print("**In get_feedback** received human feedback:\n",last_message)
         # Checking if the last frontend tool is 'review proposal' so we can update the proposal
         if last_message.name == 'review_proposal':
-            # Update proposal and outline
             reviewed_proposal = json.loads(last_message.content)
             if reviewed_proposal["approved"]:
                 # Update outline with approved sections
                 outline = {k: {'title': v['title'], 'description': v['description']} for k, v in
                            reviewed_proposal['sections'].items()
                            if isinstance(v, dict) and v.get('approved')}
+                if cfg.DEBUG:
+                    print("Setting outline: {}".format(outline))
 
                 state['outline'] = outline
             # Update proposal
@@ -126,7 +129,7 @@ class MasterAgent:
         # Check and cast the last message if needed
         last_message = state['messages'][-1]
         if cfg.DEBUG:
-             print(f"In call_model, last_message: {last_message}")
+             print(f"**In call_model**, last_message: {last_message}")
         allowed_types = (AIMessage, SystemMessage, HumanMessage, ToolMessage)
 
         if not isinstance(last_message, allowed_types):
@@ -147,23 +150,25 @@ class MasterAgent:
                 f"Today's date is {datetime.now().strftime('%d/%m/%Y')}.\n"
                 "You are an expert research assistant, dedicated to helping users create comprehensive, well-sourced research reports. Your primary goal is to assist the user in producing a polished, professional report tailored to their needs.\n\n"
                 "When writing a report use the following research tools:\n"
-                "1. Use the search tool to start the research and gather additional information from credible online sources when needed.\n"
-                "2. Use the extract tool to extract additional content from relevant URLs.\n"
-                "3. Use the outline tool to analyze the gathered information and organize it into a clear, logical **outline proposal**. Break the content into meaningful sections that will guide the report structure. Wait for outline approval before continuing to the next phase.\n"
-                "4. After using the outline tool, YOU MUST use review_proposal tool. and pass the proposal as argument \n"
-                f"5. Once proposal is approved use the section_writer tool to write ONLY the sections of the report based on the **Approved Outline** {str([outline[section]['title'] for section in outline]) if outline else ''}:generated from the review_proposal tool. Ensure the report is well-written, properly sourced, and easy to understand. Avoid responding with the text of the report directly, always use the section_writer tool for the final product.\n\n"
-                "After using the outline and section writer research tools, actively engage with the user to discuss next steps. **Do not summarize your completed work**, as the user has full access to the research progress.\n\n"
+                "1. Use the tavily_search tool to start the research and gather additional information from credible online sources when needed.\n"
+                "2. Use the tavily_extract tool to extract additional content from relevant URLs.\n"
+                "3. Use the outline_writer tool to analyze the gathered information and organize it into a clear, logical **outline proposal**. Break the content into meaningful sections that will guide the report structure. You must use the outline_writer tool if the proposal has been rejected.\n"
+                "4. After EVERY time you use the outline_writer tool, YOU MUST use review_proposal tool.\n"
+                f"5. Once proposal is approved use the section_writer tool to write ONLY the sections of the report based on the **Approved Outline** {str([outline[section]['title'] for section in outline]) + ':' if outline else ''}generated from the review_proposal tool. Ensure the report is well-written, properly sourced, and easy to understand. Avoid responding with the text of the report directly, always use the section_writer tool for the final product.\n\n"
+                "After using the section_writer tool, actively engage with the user to discuss next steps. **Do not summarize your completed work**, as the user has full access to the research progress.\n"
                 "Instead of sharing details like generated outlines or reports, simply confirm the task is ready and ask for feedback or next steps. For example:\n"
                 "'I have completed [..MAX additional 5 words]. Would you like me to [..MAX additional 5 words]?'\n\n"
                 "When you have a proposal, you must only write the sections that are approved. If a section is not approved, you must not write it."
-                "Your role is to provide support, maintain clear communication, and ensure the final report aligns with the user's expectations."
+                "Your role is to provide support, maintain clear communication, and ensure the final report aligns with the user's expectations.\n\n"
             )
 
-        if 'remarks' in proposal and not outline:
+        if proposal.get('remarks') and not outline:
             prompt += (
-                f"**\nReviewed Proposal:**\n{proposal['sections']}\n"
+                f"**\nReviewed Proposal:**\n"
+                f"Approved: {proposal['approved']}\n"
+                f"Sections: {proposal['sections']}\n"
                 f"User's feedback: {proposal['remarks']}"
-                "You must use the outline_writer tool to write a new outline proposal that incorporates the user's feedback.")
+                "You must use the outline_writer tool to create a new outline proposal that incorporates the user's feedback\n.")
         if outline:
                 prompt += (
                     f"### Current State of the Report\n"
@@ -175,11 +180,11 @@ class MasterAgent:
             f"section {section['idx']} : {section['title']}\n"
             f"content : {section['content']}"
             f"footer : {section['footer']}\n\n")
-
-        prompt += f"**Report**:\n\n{report_content}"
+        if report_content:
+            prompt += f"**Report**:\n\n{report_content}"
 
         if cfg.DEBUG:
-            print("prompt: ", prompt)
+            print("prompt: ", prompt[:3000])
 
         config = copilotkit_customize_config(config, emit_tool_calls=self.frontend_tools)  # emit only frontend tools
         ainvoke_kwargs = {}
@@ -197,7 +202,7 @@ class MasterAgent:
 
         return {"messages": response}
 
-    # Define the function that decides whether to continue research using tools or proceed to writing the report
+    # Define the function that determines whether to continue research using tools or switch to agent mode, awaiting further guidance from a human
     def should_continue(self, state: ResearchState) -> Literal["tools", "human", "end"]:
         messages = state['messages']
         last_message = messages[-1]
@@ -205,6 +210,8 @@ class MasterAgent:
         if isinstance(last_message, AIMessage):
             if last_message.tool_calls:
                 for tool_call in last_message.tool_calls:
+                    if cfg.DEBUG:
+                        print("tool_call: ", tool_call)
                     # If the LLM makes a frontend tool call, route to the "human" node
                     # This essentially checks if the tool call is 'review_proposal', as it is the only frontend tool at the moment.
                     if tool_call['name'] in self.frontend_tools:

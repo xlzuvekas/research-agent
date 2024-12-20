@@ -10,14 +10,15 @@ from langchain_openai import ChatOpenAI
 from copilotkit.langchain import copilotkit_emit_state, copilotkit_customize_config, copilotkit_emit_message
 from langchain_core.runnables import RunnableConfig
 
+
+# "description": "The main sections that compose this research",  # This is a description on what are "sections"
 # Define proposal structure keys at module level for single source of truth
 PROPOSAL_FORMAT = {
     "sections": {
-        "description": "The main sections that compose this research",  # This is a description on what are "sections"
         "section1": {  # Key is the name of the item
             "title": "Title of the item",
             "description": "Description of section1",
-            "approved": True,
+            "approved": False,
             # Defines if this goes in the final structure. Set only important parts to True by default
         }
     },
@@ -42,10 +43,30 @@ async def outline_writer(research_query, state):
 
     # Check if a current proposal exists
     current_proposal = state.get('proposal', None)
-    current_proposal_text = (
-        f"Current proposal:\n{json.dumps(current_proposal, indent=2)}\n\n"
-        if current_proposal else ""
-    )
+    if current_proposal:
+        approved_sections = ""
+        non_approved_sections = ""
+        for k, v in current_proposal['sections'].items():
+            if isinstance(v, dict) and v.get('approved'):
+                approved_sections += f"\"{v['title']}\", "
+            else:
+                non_approved_sections += f"\"{v['title']}\", "
+        # Remove trailing ", "
+        approved_sections = approved_sections.rstrip(", ")
+        non_approved_sections = non_approved_sections.rstrip(", ")
+        current_proposal_text = (
+            f"Current proposal:\n{json.dumps(current_proposal, indent=2)}\n\n"
+            "Consider the user's remarks when drafting the revised proposal. ")
+        if approved_sections:
+            current_proposal_text += (
+                f"Ensure to include the following user approved sections in the new proposal: {approved_sections}. ")
+        if non_approved_sections:
+            current_proposal_text += (
+                f"If the user did not mention in the remarks any edits requests regarding the following non approved sections: {non_approved_sections}, omit those sections from the new proposal."
+                )
+        current_proposal_text += ("Make sure to clear the old")
+    else:
+        current_proposal_text = ""
 
     prompt = [{
         "role": "system",
@@ -56,15 +77,17 @@ async def outline_writer(research_query, state):
         "role": "user",
         "content": f"Today's date is {datetime.now().strftime('%d/%m/%Y')}\n."
                    f"Research Topic: {research_query}\n"
-                   f"Create a detailed proposal that includes report's sections"
+                   f"Create a detailed proposal that includes report's sections. "
                    f"Please return nothing but a JSON in the "
                    f"following format:\n"
                    f"{json.dumps(PROPOSAL_FORMAT, indent=2)}\n"
-                   f"Here are some relevant sources to consider while planning the report:\n"
-                   f"{sources_summary}\n"
                    f"{current_proposal_text}"
+                   f"Here are some relevant sources to consider while planning the proposal:\n"
+                   f"{sources_summary}\n\n"
                    f"Your Proposal:"
     }]
+
+    # print(f"**In outline tool**:{prompt[:1000]}")
 
     config = RunnableConfig()
     state["logs"] = state.get("logs", [])
@@ -103,6 +126,7 @@ async def outline_writer(research_query, state):
         # Add timestamp to proposal
         proposal["timestamp"] = datetime.now().isoformat()
         proposal["approved"] = False
+        proposal["remarks"] = ""   # Reset user remarks if the model included them in the new proposal
 
         tool_msg = f"Generated the following outline proposal:\n{response}"
         state["proposal"] = proposal
