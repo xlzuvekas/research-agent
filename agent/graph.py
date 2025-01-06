@@ -102,9 +102,8 @@ class MasterAgent:
         # Process human feedback from frontend
         config = copilotkit_customize_config(
             config,
-            emit_messages=True,  # enable emitting messages to the frontend
+            emit_messages=True,  # make sure to enable emitting messages to the frontend
         )
-        await copilotkit_exit(config)  # Exit CopilotKit after the execution of its frontend tool
         last_message = cast(ToolMessage, state["messages"][-1])
         if cfg.DEBUG:
             print("**In get_feedback** received human feedback:\n",last_message)
@@ -118,8 +117,12 @@ class MasterAgent:
                            if isinstance(v, dict) and v.get('approved')}
                 if cfg.DEBUG:
                     print("Setting outline: {}".format(outline))
-
+                # await copilotkit_emit_message(config, "✅ Received approved outline! Moving forward with writing the sections")
                 state['outline'] = outline
+            # else:
+            ## Can potentially emit messages to client
+            #     await copilotkit_emit_message(config,
+            #                                   "❌ Received rejected outline. Generating a new proposal based on your remarks.")
             # Update proposal
             state["proposal"] = reviewed_proposal
 
@@ -183,8 +186,8 @@ class MasterAgent:
         if report_content:
             prompt += f"**Report**:\n\n{report_content}"
 
-        if cfg.DEBUG:
-            print("prompt: ", prompt[:3000])
+        # if cfg.DEBUG:
+        #     print("prompt: ", prompt[:3000])
 
         config = copilotkit_customize_config(config, emit_tool_calls=self.frontend_tools)  # emit only frontend tools
         ainvoke_kwargs = {}
