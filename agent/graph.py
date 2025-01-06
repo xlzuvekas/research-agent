@@ -102,9 +102,8 @@ class MasterAgent:
         # Process human feedback from frontend
         config = copilotkit_customize_config(
             config,
-            emit_messages=True,  # enable emitting messages to the frontend
+            emit_messages=True,  # make sure to enable emitting messages to the frontend
         )
-        await copilotkit_exit(config)  # Exit CopilotKit after the execution of its frontend tool
         last_message = cast(ToolMessage, state["messages"][-1])
         if cfg.DEBUG:
             print("**In get_feedback** received human feedback:\n",last_message)
@@ -118,8 +117,12 @@ class MasterAgent:
                            if isinstance(v, dict) and v.get('approved')}
                 if cfg.DEBUG:
                     print("Setting outline: {}".format(outline))
-
+                # await copilotkit_emit_message(config, "✅ Received approved outline! Moving forward with writing the sections")
                 state['outline'] = outline
+            # else:
+            ## Can potentially emit messages to client
+            #     await copilotkit_emit_message(config,
+            #                                   "❌ Received rejected outline. Generating a new proposal based on your remarks.")
             # Update proposal
             state["proposal"] = reviewed_proposal
 
@@ -152,9 +155,9 @@ class MasterAgent:
                 "When writing a report use the following research tools:\n"
                 "1. Use the tavily_search tool to start the research and gather additional information from credible online sources when needed.\n"
                 "2. Use the tavily_extract tool to extract additional content from relevant URLs.\n"
-                "3. Use the outline_writer tool to analyze the gathered information and organize it into a clear, logical **outline proposal**. Break the content into meaningful sections that will guide the report structure. You must use the outline_writer tool if the proposal has been rejected.\n"
+                "3. Use the outline_writer tool to analyze the gathered information and organize it into a clear, logical **outline proposal**. Break the content into meaningful sections that will guide the report structure. You must use the outline_writer EVERY time you need to write an outline for the report\n"
                 "4. After EVERY time you use the outline_writer tool, YOU MUST use review_proposal tool.\n"
-                f"5. Once proposal is approved use the section_writer tool to write ONLY the sections of the report based on the **Approved Outline** {str([outline[section]['title'] for section in outline]) + ':' if outline else ''}generated from the review_proposal tool. Ensure the report is well-written, properly sourced, and easy to understand. Avoid responding with the text of the report directly, always use the section_writer tool for the final product.\n\n"
+                f"5. Once **outline proposal** is approved use the section_writer tool to write ONLY the sections of the report based on the **Approved Outline**{':' + str([outline[section]['title'] for section in outline]) if outline else ''} generated from the review_proposal tool. Ensure the report is well-written, properly sourced, and easy to understand. Avoid responding with the text of the report directly, always use the section_writer tool for the final product.\n\n"
                 "After using the section_writer tool, actively engage with the user to discuss next steps. **Do not summarize your completed work**, as the user has full access to the research progress.\n"
                 "Instead of sharing details like generated outlines or reports, simply confirm the task is ready and ask for feedback or next steps. For example:\n"
                 "'I have completed [..MAX additional 5 words]. Would you like me to [..MAX additional 5 words]?'\n\n"
@@ -183,8 +186,8 @@ class MasterAgent:
         if report_content:
             prompt += f"**Report**:\n\n{report_content}"
 
-        if cfg.DEBUG:
-            print("prompt: ", prompt[:3000])
+        # if cfg.DEBUG:
+        #     print("prompt: ", prompt[:3000])
 
         config = copilotkit_customize_config(config, emit_tool_calls=self.frontend_tools)  # emit only frontend tools
         ainvoke_kwargs = {}

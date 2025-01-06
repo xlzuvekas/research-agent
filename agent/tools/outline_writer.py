@@ -56,7 +56,7 @@ async def outline_writer(research_query, state):
         non_approved_sections = non_approved_sections.rstrip(", ")
         current_proposal_text = (
             f"Current proposal:\n{json.dumps(current_proposal, indent=2)}\n\n"
-            "Consider the user's remarks when drafting the revised proposal. ")
+            "Consider the user's remarks when drafting the revised proposal and generating new sections. ")
         if approved_sections:
             current_proposal_text += (
                 f"Ensure to include the following user approved sections in the new proposal: {approved_sections}. ")
@@ -64,7 +64,6 @@ async def outline_writer(research_query, state):
             current_proposal_text += (
                 f"If the user did not mention in the remarks any edits requests regarding the following non approved sections: {non_approved_sections}, omit those sections from the new proposal."
                 )
-        current_proposal_text += ("Make sure to clear the old")
     else:
         current_proposal_text = ""
 
