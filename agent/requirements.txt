@@ -9,5 +9,5 @@ langgraph
 pydantic
 python-dotenv
 json5
-copilotkit==0.1.29
+copilotkit==0.1.32
 langgraph-cli
