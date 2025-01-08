@@ -39,14 +39,15 @@ export default function HomePage() {
             "Prompt the user to review structure proposal. Right after proposal generation",
         available: "remote",
         parameters: [],
-        renderAndWaitForResponse: ({ handler }) => (
+        // @ts-expect-error -- null element is legit
+        renderAndWaitForResponse: ({ handler, status }) => status !== 'complete' ? (
             <ProposalViewer
                 onSubmit={(approved, proposal) => handler?.({
                             ...proposal,
                             approved,
                         })}
             />
-        ),
+        ) : null,
     });
 
     const streamingSection = useStreamingContent(researchState);

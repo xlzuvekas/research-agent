@@ -21,10 +21,11 @@ export default function DocumentOptions({
     canEdit
 }: DocumentOptionsProps) {
     const getItemClass = (selected = false) => cn(
-                "bg-white",
-                selected ? "bg-blue-50" : "hover:bg-gray-200",
-                "active:bg-gray-300",
-            )
+        "bg-white hover:bg-gray-200 active:bg-gray-300",
+        {
+            'bg-blue-50': selected
+        },
+    )
     return (
         <div className="flex items-center justify-between mb-4">
             <div className="inline-flex bg-[#F5F0EA] rounded-md shadow-md p-1">
@@ -34,7 +35,7 @@ export default function DocumentOptions({
                         {state.mode === 'section' ? 'Section View' : 'Full Document'}
                         <ChevronDown className="ml-2 h-4 w-4"/>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="border border-black/10">
+                    <DropdownMenuContent className="border border-black/10 bg-white">
                         <DropdownMenuItem onClick={() => onChange({ mode: 'full' })} className={getItemClass(state.mode === 'full')}>
                             Full Document
                         </DropdownMenuItem>
