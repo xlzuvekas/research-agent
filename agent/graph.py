@@ -9,6 +9,7 @@ import asyncio
 from langchain_core.messages import AnyMessage, AIMessage, SystemMessage, HumanMessage, ToolMessage
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, START, END, add_messages
+from langgraph.types import Command
 from langchain_core.runnables import RunnableConfig
 
 from copilotkit.langchain import copilotkit_emit_state, copilotkit_customize_config, copilotkit_exit, copilotkit_emit_message
@@ -28,7 +29,6 @@ class MasterAgent:
     def __init__(self):
         self.tools = [tavily_search, tavily_extract, outline_writer, section_writer]
         self.tools_by_name = {tool.name: tool for tool in self.tools}
-        self.frontend_tools = []  # Tools defined in the frontend using 'useCopilotAction'. These tools will be accessible in state["copilotkit"]["actions"]
 
         # Define a graph
         workflow = StateGraph(ResearchState)
@@ -41,18 +41,6 @@ class MasterAgent:
 
         # Set the entrypoint as route_query
         workflow.set_entry_point("agent")
-
-        # Determine which node is called next
-        workflow.add_conditional_edges(
-            "agent",
-            self.should_continue,
-            {
-                "tools": "tools",
-                "human": "human",
-                "end": END,
-            }
-
-        )
 
         workflow.add_edge("tools", "agent")
         workflow.add_edge("human", "feedback")
@@ -128,7 +116,7 @@ class MasterAgent:
 
         return state
 
-    async def call_model(self, state: ResearchState, config: RunnableConfig):
+    async def call_model(self, state: ResearchState, config: RunnableConfig) -> Literal["tools", "human", "__end__"]:
         # Check and cast the last message if needed
         last_message = state['messages'][-1]
         if cfg.DEBUG:
@@ -139,11 +127,6 @@ class MasterAgent:
             # Cast the last message to HumanMessage if it's of an unrecognized type
             last_message = HumanMessage(content=last_message.content)
             state['messages'][-1] = last_message
-
-
-        # Keep list of frontend tools to know when to break to human node
-        for tool in state["copilotkit"]["actions"]:
-            self.frontend_tools.append(tool["name"])
 
         outline = state.get("outline", {})
         sections = state.get("sections", [])
@@ -189,7 +172,6 @@ class MasterAgent:
         # if cfg.DEBUG:
         #     print("prompt: ", prompt[:3000])
 
-        config = copilotkit_customize_config(config, emit_tool_calls=self.frontend_tools)  # emit only frontend tools
         ainvoke_kwargs = {}
         ainvoke_kwargs["parallel_tool_calls"] = False
 
@@ -203,26 +185,33 @@ class MasterAgent:
 
         response = cast(AIMessage, response)
 
-        return {"messages": response}
+        actions = state["copilotkit"]["actions"]
 
-    # Define the function that determines whether to continue research using tools or switch to agent mode, awaiting further guidance from a human
-    def should_continue(self, state: ResearchState) -> Literal["tools", "human", "end"]:
-        messages = state['messages']
-        last_message = messages[-1]
-        # Only perform checks if the last message is an AIMessage
-        if isinstance(last_message, AIMessage):
-            if last_message.tool_calls:
-                for tool_call in last_message.tool_calls:
-                    if cfg.DEBUG:
-                        print("tool_call: ", tool_call)
-                    # If the LLM makes a frontend tool call, route to the "human" node
-                    # This essentially checks if the tool call is 'review_proposal', as it is the only frontend tool at the moment.
-                    if tool_call['name'] in self.frontend_tools:
-                        return "human"
-                # If the LLM makes a regular tool call, route to the "tools" node
-                return "tools"
-        # If no conditions are met or if it's not an AIMessage, return "end" to stop
-        return "end"
+        if response.tool_calls:
+            for tool_call in response.tool_calls:
+                # If the LLM makes a frontend tool call, route to the "human" node
+                # This essentially checks if the tool call is 'review_proposal', as it is the only frontend tool at the moment.
+                if any(action.get("name") == tool_call.get("name") for action in actions):
+                    return Command(
+                        goto="human",
+                        update={
+                            "messages": response
+                        }
+                    )
+            # If the LLM makes a regular tool call, route to the "tools" node
+            return Command(
+                goto="tools",
+                update={
+                    "messages": response
+                }
+            )
+        # If no conditions are met or if it's not an AIMessage, return END to stop
+        return Command(
+            goto=END,
+            update={
+                "messages": response
+            }
+        )
 
 # #Run the async function
 #    # used for running graph locally
