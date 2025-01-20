@@ -48,3 +48,6 @@ frontend/.next
 
 # Ignore local stepup file for langgraph dev
 agent/setup.py
+
+__pycache__/
+.langgraph_api/
