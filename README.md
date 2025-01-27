@@ -1,6 +1,6 @@
 # open-research-ANA 🔍
 
-This demo showcases ANA (Agent Native Application), a research canvas app that combines Human-in-the-Loop capabilities with [Tavily's](https://tavily.com/) real-time search and CopilotKit's agentic interface. 
+This demo showcases ANA (Agent Native Application), a research canvas app that combines Human-in-the-Loop capabilities with [Tavily's](https://tavily.com/) real-time search and [CopilotKit's](https://copilotkit.ai) agentic interface. 
 
 Powered by [LangGraph](https://www.langchain.com/langgraph), it simplifies complex research tasks, making them more interactive and efficient.
 
@@ -30,8 +30,7 @@ Running locally, you'll need the following API keys:
 - [CopilotKit](https://cloud.copilotkit.ai)
 
 ### 3. Start the Agent
-There are two main components to this project: the agent and the frontend. First, we'll start the agent. If you are
-using Copilot Cloud and LangGraph Platform, you can skip this step.
+There are two main components to this project: the agent and the frontend. First, we'll start the agent.
 
 ```bash
 cd agent
@@ -49,7 +48,13 @@ langgraph up
 # Note the API URL from the output (e.g., http://localhost:8000)
 ```
 
-### 4. Start the Frontend
+### 4. Open a tunnel to your local agent
+Create a tunnel to your local agent:
+```bash
+npx copilotkit@latest dev --port 8000
+```
+
+### 5. Start the Frontend
 Next, we'll start the frontend.
 
 ```bash
@@ -58,51 +63,13 @@ pnpm install
 
 # Create and populate .env
 cat << EOF > .env
-LOCAL_DEPLOYMENT_URL=http://localhost:8000  # URL from langgraph up
-OPENAI_API_KEY=your_key
-LANGSMITH_API_KEY=your_key
-NEXT_PUBLIC_COPILOT_CLOUD_API_KEY=your_key
+OPENAI_API_KEY=your_openai_key
+LANGSMITH_API_KEY=your_langsmith_key
+NEXT_PUBLIC_COPILOT_CLOUD_API_KEY=your_copilot_cloud_key
 EOF
 
 # Start the app
 pnpm run dev
-```
-
-## Using with Copilot Cloud ☁️
-You can use either a local agent or a LangGraph Platform deployment with Copilot Cloud. Copilot Cloud is a 
-free to start hosted runtime for CopilotKit that allows you easily integrate your LangGraph Platform endpoints
-into your CopilotKit agent.
-
-### Option 1: Local Agent
-1. Create a tunnel to your local agent:
-```bash
-npx @copilotkit/cli tunnel 8000
-```
-
-### Option 2: LangGraph Platform
-1. Deploy your agent using [LangGraph Platform](https://langchain-ai.github.io/langgraph/cloud/deployment/cloud/)
-2. Use the deployment URL provided
-
-### Register the Endpoint
-For either option:
-1. Go to [Copilot Cloud](https://cloud.copilotkit.ai)
-2. Add a new Remote Endpoint
-3. Enter your tunnel URL or LangGraph Platform deployment URL
-4. Provide your `LANGSMITH_API_KEY`
-5. Test and Save
-
-## Deployment Options 🛠️
-
-### Local Development (Default)
-```bash
-pnpm run dev
-```
-
-### Remote Agent
-```bash
-# Deploy agent using LangGraph Platform
-# Set DEPLOYMENT_URL in frontend/.env
-pnpm run remote-lgc-dev
 ```
 
 ## Documentation 📚
