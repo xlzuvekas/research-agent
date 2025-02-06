@@ -175,7 +175,8 @@ class MasterAgent:
         ainvoke_kwargs = {}
         ainvoke_kwargs["parallel_tool_calls"] = False
 
-        response = await cfg.FACTUAL_LLM.bind_tools(self.tools + state["copilotkit"]["actions"],
+        cpk_actions = state.get("copilotkit", {}).get("actions", [])
+        response = await cfg.FACTUAL_LLM.bind_tools(self.tools + cpk_actions,
                                           **ainvoke_kwargs).ainvoke([
             SystemMessage(
                 content=prompt
@@ -185,13 +186,11 @@ class MasterAgent:
 
         response = cast(AIMessage, response)
 
-        actions = state["copilotkit"]["actions"]
-
         if response.tool_calls:
             for tool_call in response.tool_calls:
                 # If the LLM makes a frontend tool call, route to the "human" node
                 # This essentially checks if the tool call is 'review_proposal', as it is the only frontend tool at the moment.
-                if any(action.get("name") == tool_call.get("name") for action in actions):
+                if any(action.get("name") == tool_call.get("name") for action in cpk_actions):
                     return Command(
                         goto="human",
                         update={
