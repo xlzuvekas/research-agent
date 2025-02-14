@@ -1,5 +1,5 @@
 import { Section } from "@/lib/types";
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import DocumentOptions from "@/components/document-options";
 import { DocumentsScrollbar } from "@/components/documents-scrollbar";
 import { DocumentViewer } from "@/components/document-viewer";
@@ -15,10 +15,9 @@ interface DocumentsViewProps {
     streamingSection?: Section | null;
 }
 
-export function DocumentsView({ sections, selectedSection, onSelectSection, streamingSection }: DocumentsViewProps) {
+export function DocumentsView({ sections: sectionsArg, selectedSection, onSelectSection, streamingSection }: DocumentsViewProps) {
     const { state, setResearchState } = useResearch()
     const { isLoading: running } = useCopilotChat()
-    const [viewableSection, setViewableSection] = useState(selectedSection)
     const [documentOptionsState, setDocumentOptionsState] = useState<DocumentOptionsState>({ mode: 'full', editMode: false })
 
     const handleSectionEdit = useCallback((editedSection: Section) => {
@@ -28,16 +27,21 @@ export function DocumentsView({ sections, selectedSection, onSelectSection, stre
         })
     }, [setResearchState, state])
 
-    useEffect(() => {
-        if (selectedSection) {
-            setViewableSection(selectedSection)
-            return;
-        }
-
+    const currentSection = useMemo(() => {
         if (streamingSection?.id && streamingSection.id !== (selectedSection as Section | undefined)?.id) {
-            setViewableSection(streamingSection as Section)
+            return streamingSection
         }
+        return selectedSection;
     }, [streamingSection, selectedSection]);
+
+    const sections = useMemo(() => {
+        if (!streamingSection?.id) return sectionsArg;
+        if (sectionsArg.some(s => s.id === streamingSection.id)) return sectionsArg;
+        return [
+            ...sectionsArg,
+            streamingSection,
+        ]
+    }, [sectionsArg, streamingSection]);
 
     const emptyState = useMemo(() => {
         let placeholder = 'Start by asking a research question in the chat'
@@ -62,16 +66,16 @@ export function DocumentsView({ sections, selectedSection, onSelectSection, stre
             <DocumentOptions
                 onChange={change => setDocumentOptionsState(prev => ({ ...prev, ...change }))}
                 state={documentOptionsState}
-                canEdit={Boolean(!running && sections.length && (viewableSection || documentOptionsState.mode === 'full'))}
+                canEdit={Boolean(!running && sections.length && (currentSection || documentOptionsState.mode === 'full'))}
             />
 
             <div className="flex flex-1 overflow-hidden">
                 {documentOptionsState.mode === 'section' ? (
                 <div className="flex flex-1 overflow-hidden">
                     {/* Selected section view on the left */}
-                    {viewableSection ? (
+                    {currentSection ? (
                         <DocumentViewer
-                            section={viewableSection}
+                            section={currentSection}
                             zoomLevel={100}
                             onSelect={onSelectSection}
                             onSectionEdit={handleSectionEdit}
