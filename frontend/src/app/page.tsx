@@ -40,9 +40,9 @@ export default function HomePage() {
         available: "remote",
         parameters: [],
         // @ts-expect-error -- null element is legit
-        renderAndWaitForResponse: ({ handler, status }) => status !== 'complete' ? (
+        renderAndWaitForResponse: ({ respond, status }) => status !== 'complete' ? (
             <ProposalViewer
-                onSubmit={(approved, proposal) => handler?.({
+                onSubmit={(approved, proposal) => respond?.({
                             ...proposal,
                             approved,
                         })}
