@@ -3,7 +3,7 @@
 import Chat from "@/components/chat";
 import { useEffect, useRef, useState } from "react";
 import { GripVertical } from "lucide-react";
-import { useCoAgentStateRender, useCopilotAction } from "@copilotkit/react-core";
+import { useCoAgentStateRender, useLangGraphInterrupt } from "@copilotkit/react-core";
 
 import { ResearchState } from "@/lib/types";
 import { Progress } from "@/components/progress";
@@ -33,22 +33,20 @@ export default function HomePage() {
         },
     }, [researchState]);
 
-    useCopilotAction({
-        name: "review_proposal",
-        description:
-            "Prompt the user to review structure proposal. Right after proposal generation",
-        available: "remote",
-        parameters: [],
-        // @ts-expect-error -- null element is legit
-        renderAndWaitForResponse: ({ respond, status }) => status !== 'complete' ? (
-            <ProposalViewer
-                onSubmit={(approved, proposal) => respond?.({
-                            ...proposal,
-                            approved,
-                        })}
+    useLangGraphInterrupt({
+        render: ({ resolve, event }) => {
+            return <ProposalViewer
+                // @ts-expect-error Expected runtime type is correct
+                proposal={event.value}
+                onSubmit={(approved, proposal) => resolve(
+                    JSON.stringify({
+                        ...proposal,
+                        approved,
+                    })
+                )}
             />
-        ) : null,
-    });
+        }
+    })
 
     const streamingSection = useStreamingContent(researchState);
 
@@ -94,9 +92,6 @@ export default function HomePage() {
         <div
             className="h-screen bg-[#FAF9F6] text-[#3D2B1F] font-lato px-8 2xl:px-[8vw]">
             <div className="h-full border-black/10 border-y-0">
-                {/* Toolbar */}
-                {/*<Toolbar />*/}
-
                 {/* Main Chat Window */}
                 <div className="flex h-full overflow-hidden flex-1" ref={containerRef}>
                     <div style={{width: `${chatWidth}%`}}>
