@@ -42,16 +42,16 @@ TAVILY_API_KEY=your_key
 LANGSMITH_API_KEY=your_key
 EOF
 
-# Start the agent
+## Start the agent
 langgraph up
 
-# Note the API URL from the output (e.g., http://localhost:8000)
+# Note the API URL from the output (e.g., http://localhost:8123)
 ```
 
 ### 4. Open a tunnel to your local agent
 Create a tunnel to your local agent:
 ```bash
-npx copilotkit@latest dev --port 8000
+npx copilotkit@latest dev --port 8123
 ```
 
 ### 5. Start the Frontend
