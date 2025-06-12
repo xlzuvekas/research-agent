@@ -132,7 +132,7 @@ async def section_writer(research_query, section_title, idx, state):
                 f"Content : {current_section_state['content']}\n"
                 f"Footer : {current_section_state['footer']}\n\n"
                 "Now use the user's request to alter the given section."
-                f"The user request : {[message_content for message_type, message_content in state['messages'].items() if message_type == 'HumanMessage'][-1]}"
+                f"The user request : {next((msg['content'] for msg in reversed(state['messages']) if msg['type'] == 'HumanMessage'), 'No specific user request found')}"
             )
         }, {
             "role": "user",

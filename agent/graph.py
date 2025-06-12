@@ -156,7 +156,16 @@ class ResearchAgent:
                 return Command(goto="process_feedback_node", update={"messages": ToolMessage(tool_call_id=tool_call["id"], content="")})
 
             # Temporary messages struct that are accessible only to tools.
-            state['messages'] = {'HumanMessage' if type(message) == HumanMessage else 'AIMessage' : message.content for message in state['messages']}
+            # Convert messages to a list of dicts to preserve all messages and their order
+            state['messages'] = [
+                {
+                    'type': 'HumanMessage' if isinstance(message, HumanMessage) else 
+                           'SystemMessage' if isinstance(message, SystemMessage) else 
+                           'ToolMessage' if isinstance(message, ToolMessage) else 'AIMessage',
+                    'content': message.content
+                } 
+                for message in state['messages']
+            ]
 
             # Add a state key to the tool call so the tool can access state
             tool_call["args"]["state"] = state

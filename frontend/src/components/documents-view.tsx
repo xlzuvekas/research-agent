@@ -16,16 +16,16 @@ interface DocumentsViewProps {
 }
 
 export function DocumentsView({ sections: sectionsArg, selectedSection, onSelectSection, streamingSection }: DocumentsViewProps) {
-    const { state, setResearchState } = useResearch()
+    const { setResearchState } = useResearch()
     const { isLoading: running } = useCopilotChat()
     const [documentOptionsState, setDocumentOptionsState] = useState<DocumentOptionsState>({ mode: 'full', editMode: false })
 
     const handleSectionEdit = useCallback((editedSection: Section) => {
-        setResearchState({
-            ...state,
-            sections: state.sections.map(section => section.id === editedSection.id ? editedSection : section)
-        })
-    }, [setResearchState, state])
+        setResearchState((prevState) => ({
+            ...prevState,
+            sections: prevState.sections?.map(section => section.id === editedSection.id ? editedSection : section) || []
+        }))
+    }, [setResearchState])
 
     const currentSection = useMemo(() => {
         if (streamingSection?.id && streamingSection.id !== (selectedSection as Section | undefined)?.id) {
