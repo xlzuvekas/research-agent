@@ -75,7 +75,7 @@ export function ProposalViewer({
                 id={`${sectionType}-${sectionKey}`}
                 checked={section.approved}
                 onCheckedChange={(checked) => handleCheckboxChange(sectionType, sectionKey, checked as boolean)}
-                className="border border-black/10 data-[state=checked]:text-[var(--primary)]"
+                className="border border-input data-[state=checked]:text-primary"
             />
             <div className="grid gap-1.5 leading-none">
                 <label
@@ -90,7 +90,7 @@ export function ProposalViewer({
     )
 
     return (
-        <Card className="w-full max-w-4xl mx-auto border-black/10 shadow-none rounded-none">
+        <Card className="w-full max-w-4xl mx-auto border-border shadow-sm rounded-lg">
             <CardHeader>
                 <CardTitle>Research Paper Proposal</CardTitle>
                 <CardDescription>
@@ -108,7 +108,7 @@ export function ProposalViewer({
                             <Textarea
                                 id="remarks"
                                 placeholder="Enter any additional feedback or remarks..."
-                                className="min-h-[100px] border-black/10 resize-none"
+                                className="min-h-[100px] border-input resize-none"
                                 onChange={(e) => handleRemarksChange(e.target.value)}
                                 value={reviewedProposal.remarks}
                             />
@@ -119,14 +119,15 @@ export function ProposalViewer({
             <CardFooter className="flex justify-between">
                 <Button
                     onClick={() => handleSubmit(false)}
-                    className="text-red-500"
+                    variant="outline"
+                    className="text-destructive hover:text-destructive"
                     disabled={!reviewedProposal.remarks?.length}
                 >
                     Reject Proposal
                 </Button>
                 <Button
                     onClick={() => handleSubmit(true)}
-                    className="bg-[var(--primary)] text-white hover:bg-[#68330d]"
+                    variant="default"
                     disabled={!Object.values(reviewedProposal.sections).some(section => section.approved)}
                 >
                     Approve Proposal

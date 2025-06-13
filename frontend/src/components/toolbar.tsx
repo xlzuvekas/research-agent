@@ -12,7 +12,7 @@ interface NavButtonProps {
 function NavButton({ icon: Icon, onClick, disabled }: NavButtonProps) {
     return (
         <button onClick={onClick} disabled={disabled}>
-            <Icon className={`h-6 w-6 ${disabled ? 'text-[#8B4513]/40' : 'text-[#8B4513]'}`} />
+            <Icon className={`h-5 w-5 ${disabled ? 'text-muted-foreground' : 'text-foreground hover:text-primary'} transition-colors`} />
         </button>
     );
 }
@@ -22,7 +22,7 @@ export default function Toolbar() {
 
     return (
         <div
-            className="flex h-full flex-col items-center justify-between bg-[#F5F0EA] p-4 shadow-md my-auto">
+            className="flex h-full flex-col items-center justify-between bg-sidebar-bg border-r border-sidebar-border p-4 my-auto">
             <div className="space-y-6 flex flex-col">
                 <Tooltip>
                     <TooltipTrigger asChild>

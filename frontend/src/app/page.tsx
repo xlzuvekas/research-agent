@@ -12,6 +12,7 @@ import { useResearch } from "@/components/research-context";
 import { DocumentsView } from "@/components/documents-view";
 import { useStreamingContent } from '@/lib/hooks/useStreamingContent';
 import { ProposalViewer } from "@/components/structure-proposal-viewer";
+import { HeaderBar } from "@/components/header-bar";
 
 const CHAT_MIN_WIDTH = 30;
 const CHAT_MAX_WIDTH = 50;
@@ -89,11 +90,12 @@ export default function HomePage() {
     const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
 
     return (
-        <div
-            className="h-screen bg-[#FAF9F6] text-[#3D2B1F] font-lato px-8 2xl:px-[8vw]">
-            <div className="h-full border-black/10 border-y-0">
-                {/* Main Chat Window */}
-                <div className="flex h-full overflow-hidden flex-1" ref={containerRef}>
+        <div className="h-screen bg-background text-foreground flex flex-col">
+            <HeaderBar />
+            <div className="flex-1 px-8 2xl:px-[8vw] overflow-hidden">
+                <div className="h-full border-border border-y-0">
+                    {/* Main Chat Window */}
+                    <div className="flex h-full overflow-hidden flex-1" ref={containerRef}>
                     <div style={{width: `${chatWidth}%`}}>
                         <Chat
                             onSubmitMessage={async () => {
@@ -106,9 +108,9 @@ export default function HomePage() {
 
                     <div
                         ref={dividerRef}
-                        className="w-1 bg-[var(--border)] hover:bg-[var(--primary)] cursor-col-resize flex items-center justify-center"
+                        className="w-1 bg-border hover:bg-border/80 cursor-col-resize flex items-center justify-center transition-colors"
                     >
-                        <GripVertical className="h-6 w-6 text-[var(--primary)]"/>
+                        <GripVertical className="h-5 w-5 text-muted-foreground"/>
                     </div>
 
                     {/* Document Viewer */}
@@ -118,6 +120,7 @@ export default function HomePage() {
                         selectedSection={sections?.find(s => s.id === selectedSectionId)}
                         onSelectSection={setSelectedSectionId}
                     />
+                </div>
                 </div>
             </div>
             <SourcesModal />

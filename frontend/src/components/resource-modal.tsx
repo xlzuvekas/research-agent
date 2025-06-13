@@ -8,7 +8,7 @@ export default function SourcesModal() {
 
     return (
         <Dialog open={sourcesModalOpen} onOpenChange={setSourcesModalOpen}>
-            <DialogContent className="sm:max-w-[625px] bg-[#F5F0EA]">
+            <DialogContent className="sm:max-w-[625px] bg-popover">
                 <DialogHeader>
                     <DialogTitle>Sources</DialogTitle>
                 </DialogHeader>
@@ -19,7 +19,7 @@ export default function SourcesModal() {
                         </div>
                     </div>
                 ) : (
-                    <p className="font-noto flex items-center justify-center w-full h-full">
+                    <p className="text-muted-foreground flex items-center justify-center w-full h-full">
                         Once a research was initiated, resources will show up here
                     </p>
                 )}

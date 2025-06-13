@@ -62,7 +62,7 @@ export function DocumentsView({ sections: sectionsArg, selectedSection, onSelect
     }, [sections.length, running, handleSectionEdit])
 
     return (
-        <div className={cn('flex flex-col flex-1 overflow-y-hidden h-full p-4', !sections.length ? 'pr-0' : '' )}>
+        <div className={cn('flex flex-col flex-1 overflow-y-hidden h-full p-4 animate-fade-in', !sections.length ? 'pr-0' : '' )}>
             <DocumentOptions
                 onChange={change => setDocumentOptionsState(prev => ({ ...prev, ...change }))}
                 state={documentOptionsState}

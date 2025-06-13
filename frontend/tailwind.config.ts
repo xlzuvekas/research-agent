@@ -57,8 +57,7 @@ const config: Config = {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			fontFamily: {
-				noto: ['Noto Serif', 'serif'],
-				lato: ['Lato', 'sans-sans'],
+				sans: ['var(--font-inter)', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
 			}
 		}
 	},

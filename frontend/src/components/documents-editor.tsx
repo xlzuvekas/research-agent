@@ -22,7 +22,7 @@ export function DocumentEditor({
     return (
         <div
             key={id}
-            className="bg-white p-6 overflow-auto border h-full border-black/10 transition-all duration-200 shadow-lg z-10 flex-1"
+            className="bg-card p-6 overflow-auto border h-full border-border rounded-lg transition-all duration-200 shadow-sm z-10 flex-1"
             style={scalingStyle}
         >
             <div className="flex flex-col h-full">
@@ -30,12 +30,12 @@ export function DocumentEditor({
                     type="text"
                     value={section.title}
                     onChange={(e) => onSectionEdit({ ...section, title: e.target.value })}
-                    className="text-2xl font-semibold text-center mb-4 px-4 py-2 border border-black/10 rounded bg-white/50 focus:outline-none focus:ring-1 focus:ring-black/10"
+                    className="text-2xl font-semibold text-center mb-4 px-4 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 />
                 <textarea
                     value={section.content}
                     onChange={(e) => onSectionEdit({ ...section, content: e.target.value })}
-                    className="flex-1 w-full font-mono p-4 border border-black/10 rounded bg-white/50 focus:outline-none focus:ring-1 focus:ring-black/10 resize-none"
+                    className="flex-1 w-full font-mono p-4 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 resize-none"
                 />
                 {section.footer?.length ? <Footer footer={section.footer} /> : null}
             </div>

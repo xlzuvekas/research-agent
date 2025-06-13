@@ -3,31 +3,31 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 @layer base {
   :root {
-    /* Base colors */
-    --background: #FAF9F6;
-    --foreground: #3D2B1F;
+    /* Base colors - Claude Desktop inspired */
+    --background: #FAFAFA;
+    --foreground: #1A1A1A;
     --card: #FFFFFF;
-    --card-foreground: #3D2B1F;
+    --card-foreground: #1A1A1A;
     --popover: #FFFFFF;
-    --popover-foreground: #3D2B1F;
-    --primary: #8B4513;
+    --popover-foreground: #1A1A1A;
+    --primary: #E76B39;
     --primary-foreground: #FFFFFF;
-    --secondary: rgba(139, 69, 19, 0.05);
-    --secondary-foreground: #8B4513;
-    --muted: rgba(139, 69, 19, 0.05);
-    --muted-foreground: rgba(61, 43, 31, 0.6);
-    --accent: rgba(139, 69, 19, 0.05);
-    --accent-foreground: #8B4513;
-    --destructive: #EF4444;
+    --secondary: #F5F5F5;
+    --secondary-foreground: #1A1A1A;
+    --muted: #F5F5F5;
+    --muted-foreground: #737373;
+    --accent: #FEF3E2;
+    --accent-foreground: #E76B39;
+    --destructive: #DC2626;
     --destructive-foreground: #FFFFFF;
-    --border: rgba(139, 69, 19, 0.1);
-    --input: rgba(139, 69, 19, 0.1);
-    --ring: #8B4513;
+    --border: #E5E5E5;
+    --input: #E5E5E5;
+    --ring: #E76B39;
     --radius: 0.5rem;
 
     /* Chart colors */
@@ -37,42 +37,56 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
-    /* Custom colors */
-    --primary-light: rgba(139, 69, 19, 0.05);
-    --primary-light-alt: rgba(139, 69, 19, 0.1);
+    /* Custom colors - Claude Desktop inspired */
+    --primary-light: #FEF3E2;
+    --primary-light-alt: #FDEBD4;
     --background-alt: #FFFFFF;
-    --input-border: rgba(139, 69, 19, 0.2);
-    --focus-border: rgba(139, 69, 19, 0.5);
-    --button-hover: rgba(139, 69, 19, 0.8);
-    --ai-avatar: #4A5568;
+    --input-border: #D4D4D4;
+    --focus-border: #E76B39;
+    --button-hover: #D45A2D;
+    --ai-avatar: #E76B39;
     --text-contrast: #FFFFFF;
+    --sidebar-bg: #F8F8F8;
+    --sidebar-border: #E5E5E5;
   }
 
   .dark {
     --background: #1A1A1A;
-    --foreground: #FFFFFF;
+    --foreground: #FAFAFA;
     --card: #262626;
-    --card-foreground: #FFFFFF;
+    --card-foreground: #FAFAFA;
     --popover: #262626;
-    --popover-foreground: #FFFFFF;
-    --primary: #FFFFFF;
-    --primary-foreground: #1A1A1A;
+    --popover-foreground: #FAFAFA;
+    --primary: #F97316;
+    --primary-foreground: #FFFFFF;
     --secondary: #333333;
-    --secondary-foreground: #FFFFFF;
+    --secondary-foreground: #FAFAFA;
     --muted: #333333;
-    --muted-foreground: rgba(255, 255, 255, 0.6);
-    --accent: #333333;
-    --accent-foreground: #FFFFFF;
-    --destructive: #991B1B;
+    --muted-foreground: #A3A3A3;
+    --accent: #3D2816;
+    --accent-foreground: #F97316;
+    --destructive: #DC2626;
     --destructive-foreground: #FFFFFF;
-    --border: #333333;
-    --input: #333333;
-    --ring: #D4D4D4;
+    --border: #404040;
+    --input: #404040;
+    --ring: #F97316;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    
+    /* Custom colors - Dark mode */
+    --primary-light: #3D2816;
+    --primary-light-alt: #4A321C;
+    --background-alt: #262626;
+    --input-border: #525252;
+    --focus-border: #F97316;
+    --button-hover: #EA580C;
+    --ai-avatar: #F97316;
+    --text-contrast: #FFFFFF;
+    --sidebar-bg: #1F1F1F;
+    --sidebar-border: #404040;
   }
 }
 
@@ -81,14 +95,222 @@ body {
     @apply border-border;
     --copilot-kit-primary-color: var(--primary);
     --copilot-kit-secondary-color: var(--primary-light);
-    --copilot-kit-scrollbar-color: var(--primary-light-alt);
+    --copilot-kit-scrollbar-color: var(--border);
     --copilot-kit-separator-color: var(--border);
+    --copilot-kit-background-color: var(--background);
+    --copilot-kit-foreground-color: var(--foreground);
   }
   body {
     @apply bg-background text-foreground;
   }
 }
 
+/* CopilotKit Claude Desktop styling */
 .copilotKitInput {
-  border-radius: 0 !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--border) !important;
+  background: var(--background) !important;
+  transition: all 0.15s ease !important;
+}
+
+.copilotKitInput:focus-within {
+  border-color: var(--focus-border) !important;
+  box-shadow: 0 0 0 3px rgba(231, 107, 57, 0.1) !important;
+}
+
+.copilotKitChat {
+  background: var(--background) !important;
+  font-family: var(--font-inter), system-ui, sans-serif !important;
+}
+
+.copilotKitMessage {
+  border-radius: 8px !important;
+  margin: 8px 0 !important;
+}
+
+.copilotKitAssistantMessage {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.copilotKitUserMessage {
+  background: var(--secondary) !important;
+}
+
+/* Simba Chat Customizations */
+.simba-chat .copilotKitChatHeader {
+  display: none !important;
+}
+
+.simba-chat .copilotKitMessages {
+  padding: 16px !important;
+}
+
+.simba-chat .copilotKitMessageAvatar {
+  background: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+}
+
+/* Claude Desktop-inspired animations */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  .animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateY(10px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+/* Focus states */
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Enhanced Typography for Research Documents */
+.prose {
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--foreground);
+}
+
+.prose h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--foreground);
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: var(--foreground);
+}
+
+.prose h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--foreground);
+}
+
+.prose p {
+  margin-bottom: 1.25rem;
+}
+
+.prose code {
+  background: var(--muted);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+
+.prose pre {
+  background: var(--muted);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.prose blockquote {
+  border-left: 4px solid var(--primary);
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: var(--muted-foreground);
+}
+
+.prose a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 0.2s;
+}
+
+.prose a:hover {
+  opacity: 0.8;
+}
+
+/* Paper-like document styling */
+.document-paper {
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+}
+
+/* Subtle hover effects */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading skeleton animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 25%,
+    var(--muted-foreground) 50%,
+    var(--muted) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }

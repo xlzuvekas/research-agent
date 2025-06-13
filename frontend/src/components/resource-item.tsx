@@ -22,23 +22,23 @@ export function SourceItem({ id, source }: SourceItemProps) {
     };
 
     return (
-        <div key={id} className="border border-gray-200 rounded-lg">
+        <div key={id} className="border border-border rounded-lg">
             <div
-                className={`flex items-center justify-between p-3 cursor-pointer bg-white hover:bg-gray-50 ${isOpen ? 'rounded-t-lg' : 'rounded-lg'} shadow-sm`}
+                className={`flex items-center justify-between p-3 cursor-pointer bg-card hover:bg-accent ${isOpen ? 'rounded-t-lg' : 'rounded-lg'} transition-colors`}
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <div className="flex items-center">
-                    <File className="h-5 w-5 text-[var(--primary)] mr-3"/>
+                    <File className="h-5 w-5 text-primary mr-3"/>
                     <h4 className="font-semibold">{source.title}</h4>
                 </div>
                 <div className="flex items-center gap-2">
-                    <ChevronDown className="h-4 w-4 text-gray-500"/>
+                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`}/>
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             handleRemoveSource(id);
                         }}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-destructive hover:text-destructive/80 transition-colors"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20"
                              fill="currentColor">
@@ -49,14 +49,14 @@ export function SourceItem({ id, source }: SourceItemProps) {
                     </button>
                 </div>
             </div>
-            <div className={`${isOpen ? '' : 'hidden'} p-3 bg-white rounded-b-lg border-t border-gray-100`}>
-                <p className="text-sm text-gray-600 mb-2">{source.content || 'No description available'}</p>
+            <div className={`${isOpen ? '' : 'hidden'} p-3 bg-card rounded-b-lg border-t border-border`}>
+                <p className="text-sm text-muted-foreground mb-2">{source.content || 'No description available'}</p>
                 {source.url && (
                     <a
                         href={source.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-500 hover:text-blue-700 text-sm"
+                        className="text-primary hover:text-primary/80 text-sm transition-colors"
                     >
                         View Source →
                     </a>
